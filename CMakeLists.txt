@@ -7,7 +7,9 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+find_package(Boost 1.65.0 REQUIRED)
+
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable( Sample test/main.cpp )
+add_executable( Sample src/main.cpp )
 target_link_libraries( Sample ${OpenCV_LIBS} )
