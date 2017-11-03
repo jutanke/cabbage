@@ -7,7 +7,7 @@ char const* greet()
 }
 
 
-BOOST_PYTHON_MODULE(hello_ext)
+BOOST_PYTHON_MODULE(libcabbage)
 {
     using namespace boost::python;
     def("greet", greet);
