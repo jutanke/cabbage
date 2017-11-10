@@ -1,3 +1,4 @@
+.ipynb_*
 build/
 
 # Prerequisites
