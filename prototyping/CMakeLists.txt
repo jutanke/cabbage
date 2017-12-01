@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project( Cabbage )
+project( SolveGraph )
 find_package( OpenCV REQUIRED )
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -15,8 +15,5 @@ SET(Boost_USE_STATIC_RUNTIME OFF)
 
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable( Sample src/main.cpp )
-target_link_libraries( Sample ${OpenCV_LIBS} )
-
-add_library(cabbage SHARED src/cabbage.cpp )
-target_link_libraries(cabbage ${Boost_LIBRARIES})
+add_executable( Sample src/solve_graph.cpp )
+target_link_libraries( SolveGraph ${OpenCV_LIBS} )
