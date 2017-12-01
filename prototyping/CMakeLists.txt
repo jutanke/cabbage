@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 project( SolveGraph )
-find_package( OpenCV REQUIRED )
 find_package(OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -15,5 +14,4 @@ SET(Boost_USE_STATIC_RUNTIME OFF)
 
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable( Sample src/solve_graph.cpp )
-target_link_libraries( SolveGraph ${OpenCV_LIBS} )
+add_executable( Solver src/solve_graph.cpp )
