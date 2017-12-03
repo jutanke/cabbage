@@ -8,7 +8,7 @@ if (OPENMP_FOUND)
 endif()
 
 set(Python_ADDITIONAL_VERSIONS 3.5)
-find_package(Boost 1.58.0 COMPONENTS system thread python-py35 numpy graph REQUIRED)
+find_package(Boost 1.63.0 COMPONENTS system thread python-py35 numpy graph REQUIRED)
 SET(Boost_USE_STATIC_LIBS OFF)
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)
