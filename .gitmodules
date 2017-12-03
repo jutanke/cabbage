@@ -1,0 +1,3 @@
+[submodule "external/graph"]
+	path = external/graph
+	url = https://github.com/bjoern-andres/graph
