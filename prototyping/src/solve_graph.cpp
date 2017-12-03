@@ -3,6 +3,7 @@
 #include "andres/graph/graph.hxx"
 #include "andres/graph/complete-graph.hxx"
 #include "andres/graph/multicut-lifted/kernighan-lin.hxx"
+#include "andres/graph/multicut-lifted/greedy-additive.hxx"
 
 using namespace andres::graph;
 
@@ -59,17 +60,17 @@ int main() {
 
     while (flifted_edges >> i) {
       flifted_edges >> j;
-      fedges >> ce;
+      flifted_edges >> ce;
       weights[lifted_graph.findEdge(i, j).second] = ce;
     }
 
     std::cout << "graph is build... attempt to solve it" << std::endl;
 
-    // std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
-    // multicut_lifted::greedyAdditiveEdgeContraction(original_graph, lifted_graph, weights, edge_labels);
-
     std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
-    multicut_lifted::kernighanLin(original_graph, lifted_graph, weights, edge_labels, edge_labels);
+    multicut_lifted::greedyAdditiveEdgeContraction(original_graph, lifted_graph, weights, edge_labels);
+
+    // std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
+    // multicut_lifted::kernighanLin(original_graph, lifted_graph, weights, edge_labels, edge_labels);
 
     std::cout << "done" << std::endl;
 
