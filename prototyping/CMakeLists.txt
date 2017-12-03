@@ -6,6 +6,8 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
+INCLUDE_DIRECTORIES(../external/graph/include)
+
 set(Python_ADDITIONAL_VERSIONS 3.5)
 find_package(Boost 1.58.0 COMPONENTS system thread graph REQUIRED)
 SET(Boost_USE_STATIC_LIBS OFF)
