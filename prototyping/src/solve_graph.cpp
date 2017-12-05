@@ -66,11 +66,11 @@ int main() {
 
     std::cout << "graph is build... attempt to solve it" << std::endl;
 
-    std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
-    multicut_lifted::greedyAdditiveEdgeContraction(original_graph, lifted_graph, weights, edge_labels);
-
     // std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
-    // multicut_lifted::kernighanLin(original_graph, lifted_graph, weights, edge_labels, edge_labels);
+    // multicut_lifted::greedyAdditiveEdgeContraction(original_graph, lifted_graph, weights, edge_labels);
+
+    std::vector<char> edge_labels(lifted_graph.numberOfEdges(), 1);
+    multicut_lifted::kernighanLin(original_graph, lifted_graph, weights, edge_labels, edge_labels);
 
     std::cout << "done" << std::endl;
 
