@@ -10,9 +10,9 @@ using namespace andres::graph;
 int main() {
   std::cout << "cabbage solve graph" << std::endl;
 
-    std::string url_edges = "/home/cabbage/prototyping/edges.txt";
-    std::string url_lifted_edges = "/home/cabbage/prototyping/lifted_edges.txt";
-    std::string url_config = "/home/cabbage/prototyping/config.txt";
+    std::string url_edges = "../edges.txt";
+    std::string url_lifted_edges = "../lifted_edges.txt";
+    std::string url_config = "../config.txt";
 
     std::ifstream fconfig(url_config);
     if (!fconfig) {
