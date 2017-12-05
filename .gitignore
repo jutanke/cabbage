@@ -1,6 +1,7 @@
 .ipynb_*
 build/
 
+.DS_Store
 # Prerequisites
 *.d
 
