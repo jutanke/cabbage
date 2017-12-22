@@ -12,8 +12,8 @@ from cselect import color as cs
 
 def get_visible_pedestrains(Y_gt, frame):
     Y_gt_frame1 = utils.extract_eq(Y_gt, col=0, value=frame)
-    Y_gt_frame1 = utils.extract_eq(Y_gt_frame1, col=7, value=1)
-    Y_gt_frame1 = utils.extract_eq(Y_gt_frame1, col=8, value=1)
+    #Y_gt_frame1 = utils.extract_eq(Y_gt_frame1, col=7, value=1)
+    #Y_gt_frame1 = utils.extract_eq(Y_gt_frame1, col=8, value=1)
     return Y_gt_frame1
 
 def get_visible_pedestrains_det(Y_det, frame):
@@ -53,6 +53,7 @@ class MOT16_Experiments:
         for X, Y_det, Y_gt in [mot16_02, mot16_11]:
             # --- run for each video ---
             # this is not the most efficient way but not important atm..
+            Y_gt = MOT16.simplify_gt(Y_gt)
             true_detections = []
             true_detections_per_video.append(true_detections)
             frames = X.shape[0]
@@ -64,7 +65,7 @@ class MOT16_Experiments:
                 for ped in y_det:
                     i, _,l, t, w, h, score, _, _,_ = ped
                     for ped_ in y_gt:
-                        j, pid, l_gt, t_gt, w_gt, h_gt, _, _, _ = ped_
+                        j, pid, l_gt, t_gt, w_gt, h_gt = ped_
                         assert(i == j)
                         if aabb.IoU((l,t,w,h), (l_gt,t_gt,w_gt,h_gt)) > 0.5:
                             true_detections.append(
@@ -79,6 +80,7 @@ class MOT16_Experiments:
             U = np.unique(Y[:,1])
             Color_lookup = {}
             Colors = cs.lincolor(len(U), random_sat=True, random_val=True)
+            #Colors = cs.poisson_disc_sampling_Lab(len(U))
             Colors = np.array(Colors, 'float32') / 255
             for u,c in zip(U, Colors):
                 Color_lookup[u] = c
@@ -109,7 +111,8 @@ class MOT16_Experiments:
         ax.imshow(X)
         
         for _, pid, x, y, w, h, score in Y:
+            ax.text(x, y, str(int(pid)), color='white', fontsize=17,
+                   bbox={'facecolor': 'red', 'alpha': 0.5})
+            
             bbX, bbY = utils.bb_to_plt_plot(x, y, w, h)
             ax.plot(bbX, bbY, linewidth=2, color=id_colors[pid])
-        
-        print(Y.astype('object'))
