@@ -118,6 +118,14 @@ class MOT16_Experiments:
     def get_MOT16_02_trajectories(self):
         return self.get_detections_as_trajectories(
             self.mot16_02_true_detections)
+   
+    def get_MOT16_11_gt_trajectories(self):
+        return self.get_detections_as_trajectories(
+            self.mot16_11_gt_bbs)
+    
+    def get_MOT16_11_trajectories(self):
+        return self.get_detections_as_trajectories(
+            self.mot16_11_true_detections)
     
     
     def get_detections_as_trajectories(self, true_detections):
@@ -136,6 +144,14 @@ class MOT16_Experiments:
                         self.mot16_02_true_detections,
                         self.mot16_02_color_lookup,
                         frame, with_gt, self.mot16_02_gt_bbs)
+    
+    
+    def plot_frame_MOT16_11(self, ax, frame, with_gt=False):
+        self.plot_frame(ax, 
+                        self.mot16_11_X, 
+                        self.mot16_11_true_detections,
+                        self.mot16_11_color_lookup,
+                        frame, with_gt, self.mot16_11_gt_bbs)
         
     
     def plot_frame(self, ax, X, true_detections, id_colors, frame, 
