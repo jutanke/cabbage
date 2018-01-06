@@ -5,6 +5,7 @@ pprint(Settings)
 from CUHK03_Sampler import CUHK03_Sampler
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
+from keras.applications.vgg16 import preprocess_input
 from stacknet import get_model
 from os.path import join, isfile, isdir, exists, splitext
 
@@ -27,12 +28,14 @@ def generate_training_data():
     global sampler
     while True:
         X, Y = sampler.get_train_batch(100, 100)
+        X = preprocess_input(X.astype('float64'))
         yield X, Y
 
 def generate_validation_data():
     global sampler
     while True:
         X, Y = sampler.get_test_batch(100, 100)
+        X = preprocess_input(X.astype('float64'))
         yield X, Y
 
 
