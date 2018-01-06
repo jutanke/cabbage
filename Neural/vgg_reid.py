@@ -12,7 +12,7 @@ import scipy.io
 
 
 def debug(txt):
-    if __name__ == '__main__' or True:
+    if __name__ == '__main__' or False:
         print(txt)
 
 class vgg_reid:
@@ -93,8 +93,16 @@ class vgg_reid:
             
         assert len(net) == len(layers)
         
+        _ ,h,w,z = current.shape
+        current = tf.reshape(current, [-1,int(h*w*z)])
+        net["flat"] = current
+        current = tf.layers.dense(current,1024)
+        net["fc6"] = current
+        current = tf.nn.relu(current)
+        net["relu6"]=current
+        
         current = tf.layers.dense(current,2)
-        net["fc"] = current
+        net["fc7"] = current
         cuurent = tf.nn.softmax(current)
         net["out"] = current
         return net,img_placeholder, mean_pixel
