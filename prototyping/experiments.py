@@ -128,13 +128,18 @@ class MOT16_Experiments:
             self.mot16_11_true_detections)
     
     
-    def get_detections_as_trajectories(self, true_detections):
+    def get_detections_as_trajectories(self, true_detections, as_point=False):
         trajectories = []
         for d in true_detections:
-            x,y = get_center(d)
             frame = d[0]
             pid = d[1]
-            trajectories.append((frame, pid, x, y))
+            if as_point:
+                x,y = get_center(d)
+                trajectories.append((frame, pid, x, y))
+            else:
+                x, y, w, h = d[2], d[3], d[4], d[5]
+                trajectories.append((frame, pid, x, y, w, h))
+                
         return np.array(trajectories)
     
     
