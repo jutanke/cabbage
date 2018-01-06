@@ -14,6 +14,7 @@ class CUHK03_Sampler:
         """ctor
         """
         root = Settings['data_root']
+        self.root = root
         cuhk = cuhk03(root, target_w=target_w, target_h=target_h)
         X, Y = cuhk.get_labeled()
         
@@ -29,21 +30,41 @@ class CUHK03_Sampler:
         
         self.index_test = np.array(index_test)
         self.index_train = np.array(index_train)
-        self.test_pos_pair = []
-        for i in index_test:
-            for j in index_test:
-                if Y[i] == Y[j]:
-                    self.test_pos_pair.append((i, j))
-        self.test_pos_pair = np.array(self.test_pos_pair)
+        
+        # test pairs
+        fpairs_test = self.get_pos_pairs_file_name('test')
+        if isfile(fpairs_test):
+            self.test_pos_pair = np.load(fpairs_test)
+        else:
+            self.test_pos_pair = []
+            for i in index_test:
+                for j in index_test:
+                    if Y[i] == Y[j]:
+                        self.test_pos_pair.append((i, j))
+            self.test_pos_pair = np.array(self.test_pos_pair)
+            np.save(fpairs_test, self.test_pos_pair)
         print("positive test pairs:", len(self.test_pos_pair))
         
-        self.train_pos_pair = []
-        for i in index_train:
-            for j in index_train:
-                if Y[i] == Y[j]:
-                    self.train_pos_pair.append((i, j))
-        self.train_pos_pair = np.array(self.train_pos_pair)
+        # train pairs
+        fpairs_train = self.get_pos_pairs_file_name('train')
+        if isfile(fpairs_train):
+            self.train_pos_pair = np.load(fpairs_train)
+        else:
+            self.train_pos_pair = []
+            for i in index_train:
+                for j in index_train:
+                    if Y[i] == Y[j]:
+                        self.train_pos_pair.append((i, j))
+            self.train_pos_pair = np.array(self.train_pos_pair)
+            np.save(fpairs_train, self.train_pos_pair)
         print("positive train pairs:", len(self.train_pos_pair))
+    
+    
+    def get_pos_pairs_file_name(self, folder):
+        root = self.root
+        file_name = 'cuhk03_sampler_' + folder + '.npy'
+        return join(root, file_name)
+        
     
     def get_test_batch(self, num_pos, num_neg):
         return self.get_batch(num_pos, num_neg, 
