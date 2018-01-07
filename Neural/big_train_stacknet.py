@@ -38,7 +38,7 @@ def generate_training_data():
 def generate_validation_data():
     global sampler
     while True:
-        X, Y = sampler.get_test_batch(40, 10)
+        X, Y = sampler.get_test_batch(10, 40)
         X = preprocess_input(X.astype('float64'))
         yield X, Y.astype('float64')
 
@@ -46,7 +46,7 @@ def generate_validation_data():
 model.fit_generator(generate_training_data(),
                     validation_data=generate_validation_data(),
                     validation_steps=50,
-                    steps_per_epoch=1000,
+                    steps_per_epoch=500,
                     epochs=1000,
                     callbacks=callbacks_list)
 
