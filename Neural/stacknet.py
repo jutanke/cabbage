@@ -64,7 +64,7 @@ def get_model(lr=0.01, train_upper_layers=True):
         model.layers[i].set_weights(vgg_model.layers[i+1].get_weights())
 
     sgd = SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd, loss='mean_squared_error')
+    model.compile(optimizer=sgd, loss='categorical_crossentropy')
 
     return model
 
