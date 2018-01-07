@@ -6,12 +6,12 @@ from keras.models import Sequential
 import numpy as np
 from keras.optimizers import SGD
 
-def get_model(lr=0.01, train_upper_layers=True):
-    vgg_model = VGG16(input_shape=(112, 112, 3), weights='imagenet',
+def get_model(lr=0.01, w=112, h=112, train_upper_layers=True):
+    vgg_model = VGG16(input_shape=(w, h, 3), weights='imagenet',
                       include_top=False)
 
     model = Sequential()
-    block1_conv1 = Conv2D(64, (3, 3), input_shape=(112,112,6),
+    block1_conv1 = Conv2D(64, (3, 3), input_shape=(w,h,6),
                           padding='same', name='block1_conv1',
                           activation='relu',
                           trainable=train_upper_layers)
@@ -19,7 +19,7 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(64, (3,3), padding='same', name='block1_conv2',
                           activation='relu',
                      trainable=train_upper_layers))
-    model.add(MaxPooling2D(pool_size=(2,2), name='block1_pool'))
+    model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2), name='block1_pool'))
 
     model.add(Conv2D(128, (3,3), padding='same', name='block2_conv1',
                      activation='relu',
@@ -27,7 +27,7 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(128, (3,3), padding='same', name='block2_conv2',
                      activation='relu',
                      trainable=train_upper_layers))
-    model.add(MaxPooling2D(pool_size=(2,2), name='block2_pool'))
+    model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2), name='block2_pool'))
 
     model.add(Conv2D(256, (3,3), padding='same', name='block3_conv1',
                      activation='relu',
@@ -38,7 +38,7 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(256, (3,3), padding='same', name='block3_conv3',
                      activation='relu',
                      trainable=train_upper_layers))
-    model.add(MaxPooling2D(pool_size=(2,2), name='block3_pool'))
+    model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2), name='block3_pool'))
 
     model.add(Conv2D(512, (3,3), padding='same', name='block4_conv1',
                      activation='relu',
@@ -49,7 +49,7 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(512, (3,3), padding='same', name='block4_conv3',
                      activation='relu',
                      trainable=train_upper_layers))
-    model.add(MaxPooling2D(pool_size=(2,2), name='block4_pool'))
+    model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2), name='block4_pool'))
 
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv1',
                      activation='relu',
@@ -60,11 +60,11 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv3',
                      activation='relu',
                      trainable=train_upper_layers))
-    model.add(MaxPooling2D(pool_size=(2,2), name='block5_pool'))
+    model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2), name='block5_pool'))
 
     model.add(Flatten())
-    model.add(Dense(1024, activation='tanh'))
-    model.add(Dropout(0.5))
+    model.add(Dense(4096, activation='relu'))
+    model.add(Dense(4096, activation='relu'))
     model.add(Dense(2, activation='softmax'))
 
     # --- set the fixed weights ---
