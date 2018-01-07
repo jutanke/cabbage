@@ -18,7 +18,7 @@ callbacks_list = [checkpoint, TerminateOnNaN()]
 if isfile(filepath):
     model = load_model(filepath)
 else:
-    model = get_model(lr=0.001, train_upper_layers=False)
+    model = get_model(lr=0.001, train_upper_layers=True)
 
 model.summary()
 
