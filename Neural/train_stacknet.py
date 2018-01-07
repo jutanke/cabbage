@@ -18,7 +18,7 @@ callbacks_list = [checkpoint, TerminateOnNaN()]
 if isfile(filepath):
     model = load_model(filepath)
 else:
-    model = get_model(lr=0.001, train_upper_layers=True)
+    model = get_model(lr=0.001, train_upper_layers=False)
 
 model.summary()
 
@@ -27,7 +27,7 @@ sampler = CUHK03_Sampler()
 def generate_training_data():
     global sampler
     while True:
-        X, Y = sampler.get_train_batch(40, 10)
+        X, Y = sampler.get_train_batch(50, 50)
         X = preprocess_input(X.astype('float64'))
         yield X, Y
 
