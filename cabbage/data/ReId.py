@@ -114,6 +114,8 @@ class DataSampler:
     def get_test_batch(self, num_pos, num_neg):
         """ gets a random batch from the test sets
         """
+        assert num_pos > 2
+        assert num_neg > 2
         num_pos_left, num_neg_left = num_pos, num_neg
         pos_split, neg_split = int(num_pos/3), int(num_neg/3)
         X1, Y1 = self.sample_generic_batch(pos_split, neg_split,
@@ -135,6 +137,8 @@ class DataSampler:
         """ generic batch-sampling for Market and Duke. This function
             does not work on cuhk!
         """
+        assert num_pos > 0
+        assert num_neg > 0
         pos_indx = np.random.choice(len(pos_pairs), size=num_pos, replace=False)
         sampled_pos_pairs = pos_pairs[pos_indx]
         sampled_neg_pairs = []
