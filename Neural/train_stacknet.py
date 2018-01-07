@@ -29,14 +29,14 @@ def generate_training_data():
     while True:
         X, Y = sampler.get_train_batch(50, 50)
         X = preprocess_input(X.astype('float64'))
-        yield X, Y
+        yield X, Y.astype('float64')
 
 def generate_validation_data():
     global sampler
     while True:
         X, Y = sampler.get_test_batch(40, 10)
         X = preprocess_input(X.astype('float64'))
-        yield X, Y
+        yield X, Y.astype('float64')
 
 
 model.fit_generator(generate_training_data(),
