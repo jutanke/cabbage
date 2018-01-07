@@ -7,11 +7,11 @@ import numpy as np
 from keras.optimizers import SGD
 
 def get_model(lr=0.01, train_upper_layers=True):
-    vgg_model = VGG16(input_shape=(112, 112, 3), weights='imagenet',
+    vgg_model = VGG16(input_shape=(64, 64, 3), weights='imagenet',
                       include_top=False)
 
     model = Sequential()
-    block1_conv1 = Conv2D(64, (3, 3), input_shape=(112,112,6),
+    block1_conv1 = Conv2D(64, (3, 3), input_shape=(64,64,6),
                           padding='same', name='block1_conv1',
                           trainable=train_upper_layers)
     model.add(block1_conv1)
@@ -48,6 +48,13 @@ def get_model(lr=0.01, train_upper_layers=True):
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv3',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block5_pool'))
+    
+    #model.add(Conv2D(1024, kernel_size=3, padding='valid', name='consolidate',
+    #                 trainable=train_upper_layers))
+    
+    #model.add(Conv2D(64, kernel_size=1, padding='valid', name='consolidate2',
+    #                 trainable=train_upper_layers))
+    
 
     model.add(Flatten())
     model.add(Dense(1024, activation='relu'))

@@ -3,7 +3,6 @@ from pprint import pprint
 Settings = json.load(open('../../prototyping/settings.txt'))
 pprint(Settings)
 import sys
-#sys.path.insert(0,'../')
 sys.path.append('../')
 from CUHK03_Sampler import CUHK03_Sampler
 from keras.callbacks import ModelCheckpoint, TerminateOnNaN
