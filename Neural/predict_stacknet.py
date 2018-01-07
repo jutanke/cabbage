@@ -8,7 +8,7 @@ from keras.models import load_model
 from keras.applications.vgg16 import preprocess_input
 from stacknet import get_model
 from os.path import join, isfile, isdir, exists, splitext
-
+import numpy as np
 
 root = Settings['data_root']
 filepath = join(root, 'stacknet_model.h5')
@@ -18,32 +18,15 @@ callbacks_list = [checkpoint, TerminateOnNaN()]
 if isfile(filepath):
     model = load_model(filepath)
 else:
-    model = get_model(lr=0.01)
+    raise Exception("Could not find model!")
 
 model.summary()
 
 sampler = CUHK03_Sampler()
+X, Y = sampler.get_train_batch(2, 2)
+X = preprocess_input(X.astype('float64'))
 
-def generate_training_data():
-    global sampler
-    while True:
-        X, Y = sampler.get_train_batch(100, 100)
-        X = preprocess_input(X.astype('float64'))
-        yield X, Y
+Y_ = model.predict(X)
 
-def generate_validation_data():
-    global sampler
-    while True:
-        X, Y = sampler.get_test_batch(100, 100)
-        X = preprocess_input(X.astype('float64'))
-        yield X, Y
-
-
-model.fit_generator(generate_training_data(),
-                    validation_data=generate_validation_data(),
-                    validation_steps=5,
-                    steps_per_epoch=100,
-                    epochs=1000,
-                    callbacks=callbacks_list)
-
-# load_model to load model
+print("Y\t", np.squeeze(Y))
+print("Y_hat\t", np.squeeze(Y_))
