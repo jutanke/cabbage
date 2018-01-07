@@ -13,39 +13,52 @@ def get_model(lr=0.01, train_upper_layers=True):
     model = Sequential()
     block1_conv1 = Conv2D(64, (3, 3), input_shape=(112,112,6),
                           padding='same', name='block1_conv1',
+                          activation='relu',
                           trainable=train_upper_layers)
     model.add(block1_conv1)
     model.add(Conv2D(64, (3,3), padding='same', name='block1_conv2',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block1_pool'))
 
     model.add(Conv2D(128, (3,3), padding='same', name='block2_conv1',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(128, (3,3), padding='same', name='block2_conv2',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block2_pool'))
 
     model.add(Conv2D(256, (3,3), padding='same', name='block3_conv1',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(256, (3,3), padding='same', name='block3_conv2',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(256, (3,3), padding='same', name='block3_conv3',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block3_pool'))
 
     model.add(Conv2D(512, (3,3), padding='same', name='block4_conv1',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(512, (3,3), padding='same', name='block4_conv2',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(512, (3,3), padding='same', name='block4_conv3',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block4_pool'))
 
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv1',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv2',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(Conv2D(512, (3,3), padding='same', name='block5_conv3',
+                     activation='relu',
                      trainable=train_upper_layers))
     model.add(MaxPooling2D(pool_size=(2,2), name='block5_pool'))
 
