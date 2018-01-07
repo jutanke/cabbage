@@ -27,7 +27,7 @@ model.summary()
 
 sampler = ReId.DataSampler(root, 64, 64)
 
-X, Y = sampler.get_train_batch(2, 2)
+X, Y = sampler.get_train_batch(3, 3)
 X = preprocess_input(X.astype('float64'))
 
 Y_ = model.predict(X)
