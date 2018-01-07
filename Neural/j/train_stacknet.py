@@ -1,7 +1,10 @@
 import json
 from pprint import pprint
-Settings = json.load(open('../prototyping/settings.txt'))
+Settings = json.load(open('../../prototyping/settings.txt'))
 pprint(Settings)
+import sys
+#sys.path.insert(0,'../')
+sys.path.append('../')
 from CUHK03_Sampler import CUHK03_Sampler
 from keras.callbacks import ModelCheckpoint, TerminateOnNaN
 from keras.models import load_model
@@ -22,7 +25,7 @@ else:
 
 model.summary()
 
-sampler = CUHK03_Sampler()
+sampler = CUHK03_Sampler(settings_url='../../prototyping/settings.txt')
 
 def generate_training_data():
     global sampler

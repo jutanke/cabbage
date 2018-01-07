@@ -4,33 +4,33 @@ from os.path import join, isfile, isdir, exists, splitext
 from pak import utils
 import json
 from pprint import pprint
-Settings = json.load(open('../prototyping/settings.txt'))
-pprint(Settings)
 from pak.datasets.CUHK03 import cuhk03
 
 class CUHK03_Sampler:
-    
-    def __init__(self, target_w=112, target_h=112, T=100):
+
+    def __init__(self, target_w=112, target_h=112, T=100, settings_url='../prototyping/settings.txt'):
         """ctor
         """
+        Settings = json.load(open(settings_url))
+        pprint(Settings)
         root = Settings['data_root']
         self.root = root
         cuhk = cuhk03(root, target_w=target_w, target_h=target_h)
         X, Y = cuhk.get_labeled()
-        
+
         self.X = X
         self.Y = Y
-        
+
         index_test, index_train = [], []
         for i, y in enumerate(Y):
             if y <= T:
                 index_test.append(i)
             else:
                 index_train.append(i)
-        
+
         self.index_test = np.array(index_test)
         self.index_train = np.array(index_train)
-        
+
         # test pairs
         fpairs_test = self.get_pos_pairs_file_name('test')
         if isfile(fpairs_test):
@@ -44,7 +44,7 @@ class CUHK03_Sampler:
             self.test_pos_pair = np.array(self.test_pos_pair)
             np.save(fpairs_test, self.test_pos_pair)
         print("positive test pairs:", len(self.test_pos_pair))
-        
+
         # train pairs
         fpairs_train = self.get_pos_pairs_file_name('train')
         if isfile(fpairs_train):
@@ -58,23 +58,23 @@ class CUHK03_Sampler:
             self.train_pos_pair = np.array(self.train_pos_pair)
             np.save(fpairs_train, self.train_pos_pair)
         print("positive train pairs:", len(self.train_pos_pair))
-    
-    
+
+
     def get_pos_pairs_file_name(self, folder):
         root = self.root
         file_name = 'cuhk03_sampler_' + folder + '.npy'
         return join(root, file_name)
-        
-    
+
+
     def get_test_batch(self, num_pos, num_neg):
-        return self.get_batch(num_pos, num_neg, 
+        return self.get_batch(num_pos, num_neg,
                               self.test_pos_pair, self.index_test)
-    
+
     def get_train_batch(self, num_pos, num_neg):
-        return self.get_batch(num_pos, num_neg, 
+        return self.get_batch(num_pos, num_neg,
                               self.train_pos_pair, self.index_train)
-    
-    
+
+
     def get_batch(self, num_pos, num_neg, pos_pairs, valid_indexes):
         """ generic batch function
         """
@@ -107,11 +107,11 @@ class CUHK03_Sampler:
 
         X = np.concatenate((X_a, X_b), axis=3)
         Y = np.array([(1, 0)] * num_pos + [(0, 1)] * num_neg)
-        
+
         n = num_pos + num_neg
         order = np.random.choice(n, size=n, replace=False)
-        
+
         return X[order], Y[order]
-        
-                    
+
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
