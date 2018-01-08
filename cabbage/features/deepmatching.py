@@ -3,6 +3,7 @@ from os import makedirs, listdir
 from os.path import join, isfile, isdir, exists, splitext
 import subprocess
 from math import ceil, floor
+from pppr import aabb
 
 
 class DeepMatching:
@@ -20,9 +21,53 @@ class DeepMatching:
         self.data_loc = data_loc
         self.delta_max = delta_max
 
+
+    def calculate_cost(self, video_name, frame1, bb1, frame2, bb2):
+        """ calculates the costs that are needed for the Lifted Graph Cut
+
+            frame1: {int}
+            bb1: {aabb}: (x, y, w, h)
+            frame2: {int}
+            bb2: {aabb}
+        """
+        M = self.get_match(video_name, frame1, frame2)
+        is_same_frame = frame1 == frame2
+
+        intersections = 0
+        unions = 0
+
+        for x,y, u, v, _, _ in M:
+            p = (x,y)
+            q = (u,v)
+            if is_same_frame:
+                inside_one = aabb.is_inside(bb1, p)
+                inside_two = aabb.is_inside(bb2, p)
+            else:
+                inside_one = aabb.is_inside(bb1, p)
+                inside_two = aabb.is_inside(bb2, q)
+
+            if inside_one and inside_two:
+                intersections += 1
+            if inside_one or inside_two:
+                unions += 1
+
+        if unions > 0:
+            f_dm = intersections/unions
+        else:
+            f_dm = 0.5
+
+        if f_dm <= 0:
+            f_dm = 0.000000001  # to prevent numerical issues
+
+        return f_dm
+
+
     def get_match(self, video_name, frame1, frame2):
+        """ gets the deep match between two frames in the given video
         """
-        """
+        assert ceil(frame1) == floor(frame1)
+        assert ceil(frame2) == floor(frame2)
+        frame1, frame2 = int(frame1), int(frame2)
         assert frame1 <= frame2, "First frame must be greater/equal"
         M = self.get_matches(video_name, frame1)
         n = len(M)
