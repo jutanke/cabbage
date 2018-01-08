@@ -28,6 +28,25 @@ class MOT16Sampler:
     """ Sample ids from MOT16
     """
 
+    def get_all_batch(self, num_pos, num_neg):
+        """
+        """
+        X_ = []
+        Y_ = []
+        for key, _ in self.pos_pairs.items():
+            X, Y = self.get_named_batch(key, num_pos, num_neg)
+            X_.append(X)
+            Y_.append(Y)
+
+        X = np.vstack(X_)
+        Y = np.vstack(Y_)
+
+        n = len(self.pos_pairs.items()) * (num_pos + num_neg)
+        order = np.random.choice(n, size=n, replace=False)
+
+        return X[order], Y[order]
+
+
     def get_named_batch(self, key, num_pos, num_neg):
         """ get a batch based on the video (e.g. MOT16-02)
         """
@@ -138,6 +157,8 @@ class MOT16Sampler:
                 pos_pairs = get_positive_pairs_by_index(_Y)
                 np.save(fPos_pairs, pos_pairs)
                 self.pos_pairs[F] = pos_pairs
+
+            print("pos pairs:", self.pos_pairs[F].shape)
 
 
             end = time()
