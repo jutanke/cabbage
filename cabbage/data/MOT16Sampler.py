@@ -77,8 +77,8 @@ class MOT16Sampler:
         self.lookup = {}
         self.pos_pairs = {}
 
-        #for F in mot16.get_train_folders():
-        for F in ['MOT16-02']:
+        for F in mot16.get_train_folders():
+        #for F in ['MOT16-02']:
             start = time()
             fX = join(data_loc, 'X_' + F + '.npy')
             fY = join(data_loc, 'Y_' + F + '.npy')
