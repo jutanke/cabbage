@@ -54,10 +54,10 @@ class DeepMatching:
         if unions > 0:
             f_dm = intersections/unions
         else:
-            f_dm = 0.5
+            f_dm = 0.5  # uncertain
 
         if f_dm <= 0:
-            f_dm = 0.000000001  # to prevent numerical issues
+            f_dm = 1e-10  # to prevent numerical issues
 
         return f_dm
 
