@@ -6,6 +6,19 @@ from os import makedirs, listdir
 from os.path import join, isfile, isdir, exists, splitext
 
 
+def get_positive_pairs_by_index(Y):
+    """ get all positive pairs in Y
+    """
+    n = len(Y)
+    positive_pairs = []
+    for i in range(n):
+        if Y[i] > 0:
+            for j in range(n):
+                if Y[i] == Y[j]:
+                    positive_pairs.append((i,j))
+    return np.array(positive_pairs)
+
+
 class DataSampler:
     """ helps to sample person-ReId data from different sources
     """
@@ -53,7 +66,7 @@ class DataSampler:
         if isfile(fname_test):
             pos_pairs_test = np.load(fname_test)
         else:
-            pos_pairs_test = self.get_positive_pairs_by_index(Y_test)
+            pos_pairs_test = get_positive_pairs_by_index(Y_test)
             np.save(fname_test, pos_pairs_test)
 
         print("(" + dataset_name + ") positive test pairs: ", len(pos_pairs_test))
@@ -62,25 +75,12 @@ class DataSampler:
         if isfile(fname_train):
             pos_pairs_train = np.load(fname_train)
         else:
-            pos_pairs_train = self.get_positive_pairs_by_index(Y)
+            pos_pairs_train = get_positive_pairs_by_index(Y)
             np.save(fname_train, pos_pairs_train)
 
         print("(" + dataset_name + ") positive train pairs: ", len(pos_pairs_train))
 
         return X, Y, pos_pairs_train, X_test, Y_test, pos_pairs_test
-
-
-    def get_positive_pairs_by_index(self, Y):
-        """ get all positive pairs in Y
-        """
-        n = len(Y)
-        positive_pairs = []
-        for i in range(n):
-            if Y[i] > 0:
-                for j in range(n):
-                    if Y[i] == Y[j]:
-                        positive_pairs.append((i,j))
-        return np.array(positive_pairs)
 
 
     def get_pos_pairs_file_name(self, dataset):
