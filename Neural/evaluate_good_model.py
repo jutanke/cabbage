@@ -8,6 +8,7 @@ from keras.models import load_model
 from keras.applications.vgg16 import preprocess_input
 from stacknet import get_model
 from os.path import join, isfile, isdir, exists, splitext
+from pak.evaluation import one_hot_classification as ohc
 import numpy as np
 import sys
 
@@ -39,10 +40,11 @@ X = preprocess_input(X.astype('float64'))
 
 Y_ = model.predict(X)
 
-Y_clipped = (Y_[:,0] > 0.5) * 1
-Yclipped =  (Y[:,0] > 0.5) * 1
+#Y_clipped = (Y_[:,0] > 0.5) * 1
+#Yclipped =  (Y[:,0] > 0.5) * 1
 
-accuracy = np.sum( (Y_clipped == Yclipped) * 1) / len (Yclipped)
+#accuracy = np.sum( (Y_clipped == Yclipped) * 1) / len (Yclipped)
 
+accuracy = ohc.accuracy(Y, Y_)
 
 print("accuracy :   \t", accuracy)
