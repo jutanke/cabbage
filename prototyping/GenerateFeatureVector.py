@@ -4,6 +4,8 @@ from os.path import join
 
 from cabbage.features.deepmatching import DeepMatching
 import cabbage.features.spatio as st
+from cabbage.features.ReId import StackNet64x64, get_element
+
 import json
 
 
@@ -18,9 +20,9 @@ class pairwise_features:
         self.dm = DeepMatching(self.Settings['deepmatch'], join(self.root, 'deep_matching'),delta_max=delta_max)
 
         
-    def get_pairwise_vector(self,VIDEO,frame1,frame2,bb1,bb2,conf1,conf2):
+    def get_pairwise_vector(self,video_name,I1, I2, frame1,frame2,bb1,bb2,conf1,conf2):
         st_cost = st.calculate(bb1, bb2)
-        dm_cost = self.dm.calculate_cost(VIDEO, frame1, bb1, frame2, bb2)
+        dm_cost = self.dm.calculate_cost(video_name, frame1, bb1, frame2, bb2)
         reid_cost = 1
         min_conf = min(conf1,conf2)
         

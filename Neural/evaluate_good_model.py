@@ -8,6 +8,7 @@ from keras.models import load_model
 from keras.applications.vgg16 import preprocess_input
 from stacknet import get_model
 from os.path import join, isfile, isdir, exists, splitext
+from pak.evaluation import one_hot_classification as ohc
 import numpy as np
 import sys
 
@@ -34,15 +35,19 @@ model.summary()
 #sampler = ReId.DataSampler(root,64,64)
 sampler = MOT16Sampler(root, (64, 64))
 
-X, Y = sampler.get_named_batch('MOT16-02', 1000, 4000)
+X, Y = sampler.get_named_batch('MOT16-02', 5, 10)
 X = preprocess_input(X.astype('float64'))
 
 Y_ = model.predict(X)
 
-Y_clipped = (Y_[:,0] > 0.5) * 1
-Yclipped =  (Y[:,0] > 0.5) * 1
+print("Y_", Y_)
+print("Y", Y)
 
-accuracy = np.sum( (Y_clipped == Yclipped) * 1) / len (Yclipped)
+#Y_clipped = (Y_[:,0] > 0.5) * 1
+#Yclipped =  (Y[:,0] > 0.5) * 1
 
+#accuracy = np.sum( (Y_clipped == Yclipped) * 1) / len (Yclipped)
+
+accuracy = ohc.accuracy(Y, Y_)
 
 print("accuracy :   \t", accuracy)
