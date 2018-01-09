@@ -40,8 +40,7 @@ class ReId:
         """ uses the model to predict the data is the same
         """
         Y = self.model.predict(X)
-        return Y
-        #return Y[0][0]
+        return Y[0][0]
 
 
     def load_model(self, model_name, model_url):
