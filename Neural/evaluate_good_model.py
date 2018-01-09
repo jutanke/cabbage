@@ -19,7 +19,8 @@ from cabbage.data.MOT16Sampler import MOT16Sampler
 
 root = Settings['data_root']
 model_root = join(root, 'models')
-filepath = join(model_root, 'stacknet64x64_77acc.h5')
+#filepath = join(model_root, 'stacknet64x64_77acc.h5')
+filepath = join(root, 'stacknet_64x64_model.h5')
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint, TerminateOnNaN()]
 
