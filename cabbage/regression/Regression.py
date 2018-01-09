@@ -73,7 +73,7 @@ class Regression:
         #f_dm = dm.calculate_cost(video_name, frame1, bb1, frame2, bb2)
 
         # get bounding box image:
-        # I1 = get_bb_image(frame1, bb1)  # no need to do anything else!
+        # I1 = self.get_bb_image(frame1, bb1)  # no need to do anything else!
 
         # f_reid =reid.predict(I1, I2)
 
