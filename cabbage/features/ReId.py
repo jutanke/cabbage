@@ -8,12 +8,20 @@ from keras.models import load_model
 from keras.applications.vgg16 import preprocess_input
 
 
-def get_element(X, bb, shape):
+def get_element(X, bb, shape, force_uint=False):
     """ returns the bounding box area from the image X
     """
     x,y,w,h = bb
     x,y,w,h = int(x),int(y),int(w),int(h)
-    return resize(X[y:y+h,x:x+w], shape, mode='constant')
+    if force_uint:
+        I = resize(X[y:y+h,x:x+w], shape, mode='constant').copy()
+        if I.dtype != np.uint8:
+            if np.max(I) < 1.01:
+                I *= 255
+                I = I.astype('uint8')
+        return I
+    else:
+        return resize(X[y:y+h,x:x+w], shape, mode='constant')
 
 
 class ReId:
@@ -77,6 +85,7 @@ class StackNet64x64(ReId):
         w2,h2,c2 = B.shape
         assert w1 == w2 and h1 == h2 and c1 == c2
         assert w1 == 64 and h1 == 64 and c1 == 3
+        assert np.max(A) > 1 and np.max(B) > 1
 
         X = np.concatenate([A, B], axis=2)
         X = np.expand_dims(X, axis=0)

@@ -35,10 +35,13 @@ model.summary()
 #sampler = ReId.DataSampler(root,64,64)
 sampler = MOT16Sampler(root, (64, 64))
 
-X, Y = sampler.get_named_batch('MOT16-02', 1000, 4000)
+X, Y = sampler.get_named_batch('MOT16-02', 5, 10)
 X = preprocess_input(X.astype('float64'))
 
 Y_ = model.predict(X)
+
+print("Y_", Y_)
+print("Y", Y)
 
 #Y_clipped = (Y_[:,0] > 0.5) * 1
 #Yclipped =  (Y[:,0] > 0.5) * 1
