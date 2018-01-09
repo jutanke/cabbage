@@ -7,7 +7,6 @@ from cabbage.features.ReId import StackNet64x64, get_element
 from cabbage.features.deepmatching import DeepMatching
 import cabbage.features.spatio as st
 
-
 class Regression:
 
     def __init__(self, root, video_name, video, dmax, d=None,
@@ -105,7 +104,7 @@ class Regression:
 
             if i > 0:
                 self.delete_features_per_delta(i-1)
-                
+
 
         #TODO implement Regression
 
