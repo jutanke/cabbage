@@ -33,10 +33,10 @@ sampler_train = MOT16Sampler(root, (64, 64))
 def generate_training_data():
     global sampler
     while True:
-        X1, Y1 = sampler_train.get_named_batch('MOT16-04', 10, 10)
-        X2, Y2 = sampler_train.get_named_batch('MOT16-05', 10, 10)
-        X3, Y3 = sampler_train.get_named_batch('MOT16-09', 10, 10)
-        X4, Y4 = sampler_train.get_named_batch('MOT16-13', 10, 10)
+        X1, Y1 = sampler_train.get_named_batch('MOT16-04', 20, 20)
+        X2, Y2 = sampler_train.get_named_batch('MOT16-05', 20, 20)
+        X3, Y3 = sampler_train.get_named_batch('MOT16-09', 20, 20)
+        X4, Y4 = sampler_train.get_named_batch('MOT16-13', 20, 20)
         X5, Y5 = sampler.get_train_batch(50, 50)
         X = np.concatenate([X1, X2, X3, X4, X5])
         Y = np.concatenate([Y1, Y2, Y3, Y4, Y5])
