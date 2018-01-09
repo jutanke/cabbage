@@ -62,7 +62,7 @@ class Regression:
         return join(self.root, file_name)
 
 
-    def run(self):
+    def run(self, Hy):
         """ run the regression
         """
         video_name = self.video_name
