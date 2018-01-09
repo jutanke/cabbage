@@ -8,7 +8,7 @@ class Regression:
     def __init__(self, root, dmax):
         """ Regression
         """
-        self.root = join(root, 'regression' + dmax)
+        self.root = join(root, 'regression' + str(dmax))
         if not isdir(self.root):
             makedirs(self.root)
         self.dmax = dmax
