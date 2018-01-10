@@ -21,7 +21,7 @@ video = mot16.mot16_02_X
 dmax = 5
 
 #Dt = mot16.mot16_02_detections
-Dt = mot16.mot16_02_true_detections_no_pid[0:100]
+Dt = mot16.mot16_02_true_detections_no_pid
 
 reid = StoredReId(root, 5)
 
