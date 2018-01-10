@@ -39,11 +39,9 @@ class GraphGenerator:
             makedirs(data_loc)
 
         n, _ = self.detections.shape
-        n= 100
+        #n= 200
         edges = []
         lifted_edges = []
-
-        ALL_EDGES = []
 
         gen = pairwise_features(self.root,dmax)
 
@@ -69,9 +67,13 @@ class GraphGenerator:
                             conf1,
                             conf2)
 
+                    #print (vec)
+                    
                     cost = -1*(W[delta]@np.array(vec))
-
+                    #print (cost)
+                    
                     if delta > d:
+                        #print (delta,d,cost)
                         if (cost > 0):
                             # lifted edge
                             lifted_edges.append((i,j,cost))
@@ -93,6 +95,9 @@ class GraphGenerator:
         print('Lifted Edges', lifted_edges.shape)
 
         fmt = '%d %d %f'
+
+        with open('config.txt', 'w+') as f:
+            print(str(n), file=f)
 
         np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
         np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)
