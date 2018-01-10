@@ -14,13 +14,11 @@ from experiments import MOT16_Experiments
 root = Settings['data_root']
 
 mot16 = MOT16_Experiments(root)
-video_name = 'MOT16-02'
-video = mot16.mot16_02_X
+video_name = 'MOT16-11'
+video = mot16.mot16_11_X
 dmax = 100
 
-#regression = ReadOnlyRegression(root, 'MOT16-11', dmax)
-#W = regression.get_weights()
-W = get_W_mot16_02_dmax100()
+W = get_W_mot16_02_dmax100(root)
 print(W.shape)
 
 
@@ -28,11 +26,10 @@ print(W.shape)
 dm = ReadOnlyDeepMatching(root, dmax)
 
 reid = StoredReId(root, dmax)
-reid.set_mot16_02_dmax100_true_predictions3105()
+reid.set_mot16_11_dmax100_true_predictions3349()
 
 
-Dt = mot16.mot16_02_detections
-Hy = mot16.mot16_11_true_detections
+Dt = mot16.mot16_11_true_detections_no_pid
 
 gg = GraphGenerator(root, video, Dt, dmax, W, video_name=video_name,
                     DM_object=dm, reid_object=reid,
