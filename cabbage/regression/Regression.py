@@ -7,10 +7,11 @@ from cabbage.features.ReId import StackNet64x64, get_element
 from cabbage.features.deepmatching import DeepMatching
 import cabbage.features.spatio as st
 
+import cabbage.regression.LogisticRegression as LR
 
 class Regression:
 
-    def __init__(self, root, video_name, video, dmax, d=None,
+    def __init__(self, Hy, root, video_name, video, dmax, d=None,
         deep_matching_binary=None, dm_data_loc=None, bbshape=(64,64)):
         """ Regression
             root: {string} data path
@@ -24,6 +25,7 @@ class Regression:
             d = int(dmax/2)
         self.video_name = video_name
         self.root = root
+        self.Hy = Hy
         self.data_root = join(root, 'regression_' + video_name + '_dmax_' + str(dmax))
         if not isdir(self.data_root):
             makedirs(self.data_root)
@@ -46,6 +48,12 @@ class Regression:
 
         #self.reid = StackNet64x64(root)
 
+    def get_filename_thetas(self):
+        """
+        """
+        file_name = 'theta.npy'
+        return join(self.data_root, file_name)
+
 
     def get_filename_for_features(self, t):
         """ generate the filename for features
@@ -54,13 +62,21 @@ class Regression:
         return join(self.data_root, file_name)
 
 
-    def get_weights(self, t):
-        assert t < self.dmax
+    def get_weights(self):
+        """ gets the weights
+        """
+        fname = self.get_filename_thetas()
+        if not isfile(fname):
+            self.run()
+        assert isfile(fname)
+        W = np.load(fname)
+        return W
 
 
-    def run(self, Hy):
+    def run(self):
         """ run the regression
         """
+        Hy = self.Hy
         print ("run")
         video_name = self.video_name
 
@@ -86,18 +102,21 @@ class Regression:
                 if delta >= delta_max :
                     continue
 
-                pair_vec = gen.get_pairwise_vector(
-                    video_name ,
-                    I1, I2,
-                    frame1,frame2,
-                    (x1, y1, w1, h1),
-                    (x2, y2, w2, h2),
-                    conf1,
-                    conf2)
+                try:
+                    pair_vec = gen.get_pairwise_vector(
+                        video_name ,
+                        I1, I2,
+                        frame1,frame2,
+                        (x1, y1, w1, h1),
+                        (x2, y2, w2, h2),
+                        conf1,
+                        conf2)
 
-                assert delta < delta_max, "delta too big:" + str(delta)
-                pairwise_vectors[delta].append(pair_vec)
-                labels[delta].append(1 if id1==id2 else 0)
+                    assert delta < delta_max, "delta too big:" + str(delta)
+                    pairwise_vectors[delta].append(pair_vec)
+                    labels[delta].append(1 if id1==id2 else 0)
+                except:
+                    print("ignore frame " + str(frame1) + " -> " + str(frame2))
                 #print ("same" if id1==id2 else "different")
             print("detection: ",i," out of ",n)
 
@@ -105,9 +124,26 @@ class Regression:
 
             if i > 0:
                 self.delete_features_per_delta(i-1)
-                
+
 
         #TODO implement Regression
+        weights = []
+
+        for i in range(delta_max):
+            X_ = np.array( pairwise_vectors[i])
+            n, count_features = X_.shape
+            X = np.ones((n, count_features+1))
+            X[:,1:] = X_
+
+            Y = np.array(labels[i])
+            w = LR.get_params(X,Y)
+            weights.append(w)
+            LR.get_params()
+
+        fname = self.get_filename_thetas()
+        W = np.array(weights)
+        np.save(fname, W)
+
 
     def get_filenames_for_feature(self, i, delta):
         """ generate the filename for feature per delta
