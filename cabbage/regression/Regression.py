@@ -148,7 +148,7 @@ class Regression:
 
                 except (KeyboardInterrupt, SystemExit):
                     raise
-                except Exception, e:
+                except Exception as e:
                     print("ignore frame " + str(frame1) + " -> " + str(frame2) \
                         + ' because of ' + str(e))
                 #print ("same" if id1==id2 else "different")
