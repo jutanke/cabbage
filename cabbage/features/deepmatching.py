@@ -168,3 +168,11 @@ class DeepMatching:
         """ private function
         """
         return "f" + "%06d" % (frame,) + '.npy'
+
+
+class ReadOnlyDeepMatching(DeepMatching):
+    """ Cannot do anything except give data
+    """
+    def __init__(self, data_loc, delta_max):
+        self.data_loc = data_loc
+        self.delta_max = delta_max

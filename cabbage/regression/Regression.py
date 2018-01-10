@@ -12,7 +12,8 @@ import cabbage.regression.LogisticRegression as LR
 class Regression:
 
     def __init__(self, Hy, root, video_name, video, dmax, d=None,
-        deep_matching_binary=None, dm_data_loc=None, bbshape=(64,64)):
+        deep_matching_binary=None, dm_data_loc=None, bbshape=(64,64)
+        DM_object=None, reid_object=None, is_memorized_reid=False):
         """ Regression
             root: {string} data path
             video_name: {string} name of the video
@@ -36,6 +37,10 @@ class Regression:
 
         self.deep_matching_binary = deep_matching_binary
         self.dm_data_loc=dm_data_loc
+
+        self.DM_object = DM_object
+        self.reid_object = reid_object
+        self.is_memorized_reid = is_memorized_reid
 
 
         #dm_only_eval = deep_matching_binary is None
@@ -84,7 +89,11 @@ class Regression:
         delta_max=self.dmax
 
 
-        gen = pairwise_features(self.root,delta_max,self.deep_matching_binary,self.dm_data_loc)
+        gen = pairwise_features(
+            self.root,delta_max,
+            self.deep_matching_binary,
+            self.dm_data_loc,
+            DM_object=self.DM_object, reid_object=self.reid_object)
 
         #pairwise_vectors = [[] for _ in range(delta_max)]
         #labels = [[] for _ in range(delta_max)]
@@ -103,6 +112,8 @@ class Regression:
                     continue
 
                 try:
+                    i1 = i if self.is_memorized_reid else None
+                    i2 = j if self.is_memorized_reid else None
                     pair_vec = gen.get_pairwise_vector(
                         video_name ,
                         I1, I2,
@@ -110,7 +121,8 @@ class Regression:
                         (x1, y1, w1, h1),
                         (x2, y2, w2, h2),
                         conf1,
-                        conf2)
+                        conf2,
+                        i1=i1, i2=i2)
 
                     assert delta < delta_max, "delta too big:" + str(delta)
                     pairwise_vectors[delta].append(pair_vec)
@@ -135,7 +147,7 @@ class Regression:
             #X = np.ones((n, count_features+1))
             #X[:,1:] = X_
             X = np.array( pairwise_vectors[i])
-            
+
             Y = np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)

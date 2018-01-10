@@ -80,6 +80,37 @@ class StoredReId(ReId):
         return str(i) + ':' + str(j)
 
 
+    def set_mot16_11_dmax100_true_predictions3349(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-11_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-11_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-11_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-11_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_mot16_02_dmax100_true_predictions3105(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-02_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-02_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-02_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-02_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_load_model(self, fname1, fname2, ):
+        def load_if_not_there(fname, url, url_predict, url_broken):
+            if not isfile(fname):
+                with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+                    shutil.copyfileobj(res, f)
+
+        load_if_not_there(fname1, url_predict)
+        load_if_not_there(fname2, url_broken)
+        self.load_memory(fname1, fname2)
+
+
     def get_predictions_file(self, name):
         file_name = 'predict_' + name + '.npy'
         return join(self.root, file_name)
