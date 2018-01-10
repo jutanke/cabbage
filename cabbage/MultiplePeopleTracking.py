@@ -26,7 +26,7 @@ class GraphGenerator:
         if d is None:
             d = int(dmax/2)
         assert dmax > d
-        assert W.shape[0] == dmax
+        #assert W.shape[0] == dmax
 
         if video_name is None:
             video_name = "video" + str(time)
@@ -48,7 +48,7 @@ class GraphGenerator:
 
         ALL_EDGES = []
 
-        gen = pairwise_features(self.root,dmax,
+        gen = pairwise_features(self.root,None,
             DM_object=DM_object, reid_object=reid_object)
 
         vd = VideoData(detections)
