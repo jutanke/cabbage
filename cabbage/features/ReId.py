@@ -58,9 +58,9 @@ class ReId:
         elif self.verbose:
             print("Found model " + fname + "! :)")
 
-
         model = load_model(fname)
         self.model = model
+
 
 class StoredReId(ReId):
     """ Stores the exact prediction
@@ -194,9 +194,6 @@ class StackNet64x64(ReId):
     def __init__(self, root, verbose=True):
         ReId.__init__(self, root, verbose)
         model_name = 'stacknet64x64_84acc.h5'
-        #model_name = 'stacknet64x64_cheat.h5'
-        #url = 'http://188.138.127.15:81/models/stacknet64x64_cheating.h5'
-        #url = 'http://188.138.127.15:81/models/stacknet64x64_77acc.h5'
         url = 'http://188.138.127.15:81/models/stacknet64x64_84acc.h5'
         self.load_model(model_name, url)
 

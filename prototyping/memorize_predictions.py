@@ -22,6 +22,7 @@ dmax = 100
 
 #Dt = mot16.mot16_02_detections
 Dt = mot16.mot16_11_true_detections_no_pid
+#Dt = mot16.mot16_02_true_detections_no_pid
 
 reid = StoredReId(root, dmax)
 
