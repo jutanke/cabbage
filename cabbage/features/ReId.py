@@ -73,7 +73,20 @@ class StoredReId(ReId):
         self.dmax = dmax
         self.load_model(model_name, model_url)
 
-    def memorize(self, Dt, X):
+    def create_key(self, i, j):
+        return str(i) + ':' + str(j)
+
+
+    def get_predictions_file(self, name):
+        file_name = 'predict_' + name + '.npy'
+        return join(self.root, file_name)
+
+    def get_broken_file(self, name):
+        file_name = 'broken_' + name + '.npy'
+        return join(self.root, file_name)
+
+
+    def memorize(self, Dt, X, name):
         """
             Dt: {np.array} [(frame, x, y, w, h, score), ..]
             X: {np.array} (n, w, h, 3) video
@@ -81,9 +94,9 @@ class StoredReId(ReId):
         n, _ = Dt.shape
         dmax = self.dmax
 
-        Left, Right = [], []
-        Left_indx, Right_indx = [], []
+
         Broken_pair = []
+        Prediction = {}
 
         for i in range(n):
             frame1, x,y,w,h, _ = Dt[i]
@@ -96,17 +109,28 @@ class StoredReId(ReId):
                 if delta < dmax:
                     bb2 = (x,y,w,h)
                     I2 = X[int(frame2-1)]
+                    keyA, keyB = self.create_key(i, j), self.create_key(j, i)
+                    assert keyA not in Prediction and keyB not in Prediction
                     try:
-                        Left.append(get_element(I1, bb1, (64,64), force_uint=True))
-                        Right.append(get_element(I2, bb2, (64,64), force_uint=True))
-                        Left_indx.append(i)
-                        Right_indx.append(j)
+                        a = get_element(I1, bb1, (64,64), force_uint=True)
+                        b = get_element(I2, bb2, (64,64), force_uint=True)
+                        pred = StackNet64x64.predict(self, a, b)
+                        Prediction[keyA] = pred
+                        Prediction[keyB] = pred
                     except:
-                        Broken_pair.append((i,j))
-                        Broken_pair.append((j,i))
+                        Broken_pair.append(keyA)
+                        Broken_pair.append(keyB)
 
             print('handled ' + str(i) + " out of " + str(n))
-            
+
+        fname = self.get_predictions_file(name)
+        fname_broken = self.get_broken_file(name)
+        self.Broken_pair = set(Broken_pair)
+        self.Prediction = Prediction
+
+        np.save(fname, Prediction)
+        np.save(fname_broken, self.Broken_pair)
+
 
 
 class StackNet64x64(ReId):
@@ -137,15 +161,3 @@ class StackNet64x64(ReId):
         X = preprocess_input(X.astype('float64'))
 
         return ReId.predict(self, X)
-
-
-def predict_stacknet64x64(A1, A2):
-    """ predicts the probability that bb1 and bb2 are the
-        same image in X
-
-        A1: {image}
-        A2: {image}
-    """
-
-
-    x,y,w,h = bb1
