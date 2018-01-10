@@ -244,6 +244,19 @@ class Regression:
                 np.save(fname_label, l)
 
 
+def get_W_mot16_02_dmax100(root):
+    """ gets the parameters for the W
+    """
+    url = 'http://188.138.127.15:81/models/theta_mot16_02_dmax100.npy'
+    fname = 'theta_mot16_02_dmax100.npy'
+    fname = join(root, fname)
+    if not isfile(fname):
+        with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+            shutil.copyfileobj(res, f)
+    W = np.load(fname)
+    return W
+
+
 def get_W_mot16_02_dmax60(root):
     """ gets the parameters for the W
     """
@@ -253,7 +266,6 @@ def get_W_mot16_02_dmax60(root):
     if not isfile(fname):
         with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
             shutil.copyfileobj(res, f)
-
     W = np.load(fname)
     return W
 
