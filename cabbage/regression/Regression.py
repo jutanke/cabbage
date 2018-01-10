@@ -138,7 +138,6 @@ class Regression:
             Y = np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)
-            LR.get_params()
 
         fname = self.get_filename_thetas()
         W = np.array(weights)
@@ -212,3 +211,24 @@ class Regression:
 
 
 # --
+class ReadOnlyRegression(Regression):
+    """ allows only data-access
+    """
+
+    def __init__(self, root, video_name, dmax):
+        """
+        """
+        self.video_name = video_name
+        self.root = root
+        self.data_root = join(root, 'regression_' + video_name + '_dmax_' + str(dmax))
+        if not isdir(self.data_root):
+            raise Exception(self.data_root + " MUST exist (dir)")
+
+    def get_weights(self):
+        """ gets the weights
+        """
+        fname = self.get_filename_thetas()
+        if not isfile(fname):
+            raise Exception(fname + ' MUST exist (file)')
+        W = np.load(fname)
+        return W
