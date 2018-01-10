@@ -40,8 +40,7 @@ class ReId:
         """ uses the model to predict the data is the same
         """
         Y = self.model.predict(X)
-        return Y
-        #return Y[0][0]
+        return Y[0][0]
 
 
     def load_model(self, model_name, model_url):
@@ -62,6 +61,52 @@ class ReId:
 
         model = load_model(fname)
         self.model = model
+
+class StoredReId(ReId):
+    """ Stores the exact prediction
+    """
+
+    def __init__(self, root, dmax):
+        model_name = 'stacknet64x64_84_BOTH.h5'
+        model_url = 'http://188.138.127.15:81/models/stacknet64x64_84_BOTH.h5'
+        ReId.__init__(self, root, True)
+        self.dmax = dmax
+        self.load_model(model_name, model_url)
+
+    def memorize(self, Dt, X):
+        """
+            Dt: {np.array} [(frame, x, y, w, h, score), ..]
+            X: {np.array} (n, w, h, 3) video
+        """
+        n, _ = Dt.shape
+        dmax = self.dmax
+
+        Left, Right = [], []
+        Left_indx, Right_indx = [], []
+        Broken_pair = []
+
+        for i in range(n):
+            frame1, x,y,w,h, _ = Dt[i]
+            bb1 = (x,y,w,h)
+            I1 = X[int(frame1-1)]
+
+            for j in range(i+1, n):
+                frame2, x,y,w,h,_ = Dt[j]
+                delta = int(abs(frame2-frame1) )
+                if delta < dmax:
+                    bb2 = (x,y,w,h)
+                    I2 = X[int(frame2-1)]
+                    try:
+                        Left.append(get_element(I1, bb1, (64,64), force_uint=True))
+                        Right.append(get_element(I2, bb2, (64,64), force_uint=True))
+                        Left_indx.append(i)
+                        Right_indx.append(j)
+                    except:
+                        Broken_pair.append((i,j))
+                        Broken_pair.append((j,i))
+
+            print('handled ' + str(i) + " out of " + str(n))
+            
 
 
 class StackNet64x64(ReId):

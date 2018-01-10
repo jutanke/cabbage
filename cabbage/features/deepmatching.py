@@ -10,13 +10,15 @@ class DeepMatching:
     """ deep matching (http://lear.inrialpes.fr/src/deepmatching/)
     """
 
-    def __init__(self, deep_matching_binary, data_loc, delta_max):
+    def __init__(self, deep_matching_binary, data_loc, delta_max, only_eval=False):
         """
         """
-        assert isfile(deep_matching_binary), 'the deep matching binary must exist'
+        if not only_eval:
+            assert isfile(deep_matching_binary), 'the deep matching binary must exist'
         self.deepmatch_loc = deep_matching_binary
 
         if not isdir(data_loc):
+            assert not only_eval, 'Data must exist for evaluation-only class'
             makedirs(data_loc)
         self.data_loc = data_loc
         self.delta_max = delta_max
