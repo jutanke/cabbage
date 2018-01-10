@@ -72,6 +72,9 @@ class StoredReId(ReId):
         ReId.__init__(self, root, True)
         self.dmax = dmax
         self.load_model(model_name, model_url)
+        self.Broken_pair = None
+        self.Prediction = None
+
 
     def create_key(self, i, j):
         return str(i) + ':' + str(j)
@@ -81,9 +84,27 @@ class StoredReId(ReId):
         file_name = 'predict_' + name + '.npy'
         return join(self.root, file_name)
 
+
     def get_broken_file(self, name):
         file_name = 'broken_' + name + '.npy'
         return join(self.root, file_name)
+
+
+    def load_memory(self, pred_file, broken_file):
+        self.Broken_pair = np.load(broken_file)
+        self.Prediction = np.load(pred_file).item()
+
+
+    def predict(self, i, j):
+        assert self.Prediction is not None
+        assert self.Broken_pair is not None
+        key = self.create_key(i, j)
+        if key in self.Broken_pair:
+            return 0
+        elif key in self.Prediction:
+            return self.Prediction[key]
+        else:
+            raise Exception('Could not find pair ' + key)
 
 
     def memorize(self, Dt, X, name):
