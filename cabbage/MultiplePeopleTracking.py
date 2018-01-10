@@ -4,6 +4,8 @@ from os import makedirs, listdir, remove
 from os.path import join, isfile, isdir, exists, splitext
 from cabbage.features.GenerateFeatureVector import pairwise_features
 
+from time import time
+
 class GraphGenerator:
     """
     """
@@ -66,6 +68,7 @@ class GraphGenerator:
                             (x2, y2, w2, h2),
                             conf1,
                             conf2)
+
                     cost = -1*(W[delta]@np.array(vec))
 
                     if delta > d:

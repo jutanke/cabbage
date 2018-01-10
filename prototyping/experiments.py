@@ -26,7 +26,7 @@ def get_center(d):
     """
     x, y, w, h = d[2], d[3], d[4], d[5]
     return x+w/2, y+h/2
-    
+
 
 # ===========================================
 # Experiments implementation
@@ -35,30 +35,31 @@ verbose = False
 
 class MOT16_Experiments:
     def __init__(self, folder):
-        """ For the experiments we need MOT16-02 and 
+        """ For the experiments we need MOT16-02 and
             MOT16-11 for the analysis
-            
+
             The detections will have the following structure:
                 0: frame_nbr
                 1: person id
                 2: detection top-left x position
                 3: detection top-left y position
                 4: detection bb width
-                5: detection bb height 
+                5: detection bb height
                 6: detection output score
         """
         global verbose
         mot16 = MOT16(folder, verbose=verbose)
-        
+
         mot16_02 = mot16.get_train("MOT16-02", memmapped=True)
         mot16_11 = mot16.get_train("MOT16-11", memmapped=True)
-        
+
         self.mot16_02_X = mot16_02[0]
         self.mot16_11_X = mot16_11[0]
-        
+
         detections_per_video = []
         gt_per_video = []
         true_detections_per_video = []
+        true_detections_per_video_no_pid = []
         color_lookups_per_video = []
         for X, Y_det, Y_gt in [mot16_02, mot16_11]:
             # --- run for each video ---
@@ -69,17 +70,19 @@ class MOT16_Experiments:
             detections_per_video.append(all_detections)
             true_detections = []
             true_detections_per_video.append(true_detections)
+            true_detections_no_pid = []
+            true_detections_per_video_no_pid.append(true_detections_no_pid)
             gt_per_video.append(gt_bbs)
             frames = X.shape[0]
             TIMING_start = time()
             for frame in range(1, frames+1):
                 y_gt = get_visible_pedestrains(Y_gt, frame)
                 y_det = get_visible_pedestrains_det(Y_det, frame)
-            
+
                 for ped_ in y_gt:
                     j, pid, l_gt, t_gt, w_gt, h_gt = ped_
                     gt_bbs.append((j, pid, l_gt, t_gt, w_gt, h_gt))
-            
+
                 for ped in y_det:
                     i, _,l, t, w, h, score, _, _,_ = ped
                     for ped_ in y_gt:
@@ -91,11 +94,13 @@ class MOT16_Experiments:
                         if aabb.IoU((l,t,w,h), (l_gt,t_gt,w_gt,h_gt)) > 0.5:
                             true_detections.append(
                                 np.array([i, pid, l, t, w, h, score]))
+                            true_detections_no_pid.append(
+                                np.array([i, l, t, w, h, score]))
             TIMING_end = time()
             if verbose:
                 print("Handling " + str(frames) + " frames in " + \
                       str(TIMING_end - TIMING_start) + " seconds")
-        
+
             # --- figure out coloring ---
             Y = np.array(true_detections)
             U = np.unique(Y[:,1])
@@ -106,37 +111,42 @@ class MOT16_Experiments:
             for u,c in zip(U, Colors):
                 Color_lookup[u] = c
             color_lookups_per_video.append(Color_lookup)
-        
+
         self.mot16_02_gt_bbs = np.array(gt_per_video[0])
         self.mot16_11_gt_bbs = np.array(gt_per_video[1])
-        
+
         self.mot16_02_detections = np.array(detections_per_video[0])
         self.mot16_11_detections = np.array(detections_per_video[1])
-        
+
         self.mot16_02_true_detections = np.array(true_detections_per_video[0])
         self.mot16_11_true_detections = np.array(true_detections_per_video[1])
-        
+
+        self.mot16_02_true_detections_no_pid = \
+            np.array(true_detections_per_video_no_pid[0])
+        self.mot16_11_true_detections_no_pid = \
+            np.array(true_detections_per_video_no_pid[1])
+
         self.mot16_02_color_lookup = color_lookups_per_video[0]
         self.mot16_11_color_lookup = color_lookups_per_video[1]
-    
-    
+
+
     def get_MOT16_02_gt_trajectories(self):
         return self.get_detections_as_trajectories(
             self.mot16_02_gt_bbs)
-    
+
     def get_MOT16_02_trajectories(self):
         return self.get_detections_as_trajectories(
             self.mot16_02_true_detections)
-   
+
     def get_MOT16_11_gt_trajectories(self):
         return self.get_detections_as_trajectories(
             self.mot16_11_gt_bbs)
-    
+
     def get_MOT16_11_trajectories(self):
         return self.get_detections_as_trajectories(
             self.mot16_11_true_detections)
-    
-    
+
+
     def get_detections_as_trajectories(self, true_detections, as_point=False):
         trajectories = []
         for d in true_detections:
@@ -148,46 +158,46 @@ class MOT16_Experiments:
             else:
                 x, y, w, h = d[2], d[3], d[4], d[5]
                 trajectories.append((frame, pid, x, y, w, h))
-                
+
         return np.array(trajectories)
-    
-    
+
+
     def plot_frame_MOT16_02(self, ax, frame, with_gt=False):
-        self.plot_frame(ax, 
-                        self.mot16_02_X, 
+        self.plot_frame(ax,
+                        self.mot16_02_X,
                         self.mot16_02_true_detections,
                         self.mot16_02_color_lookup,
                         frame, with_gt, self.mot16_02_gt_bbs)
-    
-    
+
+
     def plot_frame_MOT16_11(self, ax, frame, with_gt=False):
-        self.plot_frame(ax, 
-                        self.mot16_11_X, 
+        self.plot_frame(ax,
+                        self.mot16_11_X,
                         self.mot16_11_true_detections,
                         self.mot16_11_color_lookup,
                         frame, with_gt, self.mot16_11_gt_bbs)
-        
-    
-    def plot_frame(self, ax, X, true_detections, id_colors, frame, 
+
+
+    def plot_frame(self, ax, X, true_detections, id_colors, frame,
                    with_gt, gt_bbs):
         """ plots the frame with its true detections
         """
         Y = utils.extract_eq(true_detections, col=0, value=frame)
         X = X[frame]
-        
+
         ax.imshow(X)
-        
+
         for _, pid, x, y, w, h, score in Y:
             ax.text(x, y, str(int(pid)), color='white', fontsize=17,
                    bbox={'facecolor': 'red', 'alpha': 0.5})
-            
+
             bbX, bbY = utils.bb_to_plt_plot(x, y, w, h)
             ax.plot(bbX, bbY, linewidth=2, color=id_colors[pid])
-            
+
         if with_gt:
             Y = utils.extract_eq(gt_bbs, col=0, value=frame)
             for _, pid, x, y, w, h in Y:
                 bbX, bbY = utils.bb_to_plt_plot(x, y, w, h)
                 ax.plot(bbX, bbY, 'g--', linewidth=4)
-            
+
 # -------------

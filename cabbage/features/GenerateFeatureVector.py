@@ -5,6 +5,8 @@ from cabbage.features.deepmatching import DeepMatching
 import cabbage.features.spatio as st
 from cabbage.features.ReId import StackNet64x64, get_element
 
+from time import time
+
 import json
 
 
@@ -23,6 +25,7 @@ class pairwise_features:
 
         self.dm = DeepMatching(deep_matching_binary,dm_data_loc, delta_max, only_eval=dm_only_eval)
         self.stacknet = StackNet64x64(self.root)
+
 
 
     def get_pairwise_vector(self,video_name,I1, I2, frame1,frame2,bb1,bb2,conf1,conf2):
