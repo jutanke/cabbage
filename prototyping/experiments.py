@@ -56,6 +56,7 @@ class MOT16_Experiments:
         self.mot16_02_X = mot16_02[0]
         self.mot16_11_X = mot16_11[0]
         
+        detections_per_video = []
         gt_per_video = []
         true_detections_per_video = []
         color_lookups_per_video = []
@@ -64,6 +65,8 @@ class MOT16_Experiments:
             # this is not the most efficient way but not important atm..
             Y_gt = MOT16.simplify_gt(Y_gt)
             gt_bbs = []
+            all_detections = []
+            detections_per_video.append(all_detections)
             true_detections = []
             true_detections_per_video.append(true_detections)
             gt_per_video.append(gt_bbs)
@@ -82,6 +85,9 @@ class MOT16_Experiments:
                     for ped_ in y_gt:
                         j, pid, l_gt, t_gt, w_gt, h_gt = ped_
                         assert(i == j)
+                        all_detections.append(
+                            np.array([i, l, t, w, h, score])
+                        )
                         if aabb.IoU((l,t,w,h), (l_gt,t_gt,w_gt,h_gt)) > 0.5:
                             true_detections.append(
                                 np.array([i, pid, l, t, w, h, score]))
@@ -103,6 +109,9 @@ class MOT16_Experiments:
         
         self.mot16_02_gt_bbs = np.array(gt_per_video[0])
         self.mot16_11_gt_bbs = np.array(gt_per_video[1])
+        
+        self.mot16_02_detections = np.array(detections_per_video[0])
+        self.mot16_11_detections = np.array(detections_per_video[1])
         
         self.mot16_02_true_detections = np.array(true_detections_per_video[0])
         self.mot16_11_true_detections = np.array(true_detections_per_video[1])
