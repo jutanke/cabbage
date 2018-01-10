@@ -34,7 +34,7 @@ class pairwise_features:
         reid_cost = self.stacknet.predict(i1, i2)
         min_conf = min(conf1,conf2)
 
-        return (st_cost , dm_cost , reid_cost , min_conf , \
+        return (1,st_cost , dm_cost , reid_cost , min_conf , \
                 st_cost**2,st_cost * dm_cost,st_cost * reid_cost, st_cost * min_conf, \
                 dm_cost**2,dm_cost * reid_cost ,dm_cost * min_conf , \
                 reid_cost**2,reid_cost * min_conf , \

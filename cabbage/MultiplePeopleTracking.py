@@ -2,6 +2,7 @@ import numpy as np
 from time import time
 from os import makedirs, listdir, remove
 from os.path import join, isfile, isdir, exists, splitext
+from cabbage.features.GenerateFeatureVector import pairwise_features
 
 class GraphGenerator:
     """
@@ -34,6 +35,63 @@ class GraphGenerator:
         data_loc = self.get_data_folder()
         if not isdir(data_loc):
             makedirs(data_loc)
+            
+        n, _ = self.detections.shape
+        n=200
+        edges = []
+        lifted_edges = []
+        
+        ALL_EDGES = []
+        
+        gen = pairwise_features(self.root,dmax)
+        
+        for i, entry in enumerate(self.detections):
+            frame1, x1, y1, w1, h1,conf1 = entry
+            I1 = self.X[int(frame1-1)]
+            for j in range(i+1, n):
+                frame2, x2, y2, w2, h2,conf2 = detections[j]
+                delta = int(abs(frame2-frame1) )
+                if delta >= dmax :
+                    continue
+
+                I2 = self.X[int(frame2-1)]
+
+                try:
+                    vec = gen.get_pairwise_vector(
+                            video_name ,
+                            I1, I2,
+                            frame1,frame2,
+                            (x1, y1, w1, h1),
+                            (x2, y2, w2, h2),
+                            conf1,
+                            conf2)
+                    cost = -1*(W[delta]@np.array(vec))
+                    
+                    if delta > d:
+                        if (cost > 0):    
+                            # lifted edge
+                            lifted_edges.append((i,j,cost))
+                    else:
+                        # normal edge
+                        edges.append((i,j,cost))
+                    
+                except:
+                    print("ignore frame " + str(frame1) + " -> " + str(frame2))
+                #print('cost:', cost)
+                #cost = 10 if pid == pid_o else -1
+            print("edges for detection: ",i," out of ",n)
+                
+                    
+        edges = np.array(edges)
+        lifted_edges = np.array(lifted_edges)
+        
+        print('Edges', edges.shape)
+        print('Lifted Edges', lifted_edges.shape)
+        
+        fmt = '%d %d %f'
+        
+        np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
+        np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)
 
 
     def get_data_folder(self):

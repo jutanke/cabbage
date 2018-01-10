@@ -130,11 +130,12 @@ class Regression:
         weights = []
 
         for i in range(delta_max):
-            X_ = np.array( pairwise_vectors[i])
-            n, count_features = X_.shape
-            X = np.ones((n, count_features+1))
-            X[:,1:] = X_
-
+            #X_ = np.array( pairwise_vectors[i])
+            #n, count_features = X_.shape
+            #X = np.ones((n, count_features+1))
+            #X[:,1:] = X_
+            X = np.array( pairwise_vectors[i])
+            
             Y = np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)
