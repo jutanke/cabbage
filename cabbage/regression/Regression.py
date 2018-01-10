@@ -12,7 +12,8 @@ import cabbage.regression.LogisticRegression as LR
 class Regression:
 
     def __init__(self, Hy, root, video_name, video, dmax, d=None,
-        deep_matching_binary=None, dm_data_loc=None, bbshape=(64,64)):
+        deep_matching_binary=None, dm_data_loc=None, bbshape=(64,64),
+        DM_object=None, reid_object=None, is_memorized_reid=False):
         """ Regression
             root: {string} data path
             video_name: {string} name of the video
@@ -36,6 +37,10 @@ class Regression:
 
         self.deep_matching_binary = deep_matching_binary
         self.dm_data_loc=dm_data_loc
+
+        self.DM_object = DM_object
+        self.reid_object = reid_object
+        self.is_memorized_reid = is_memorized_reid
 
 
         #dm_only_eval = deep_matching_binary is None
@@ -62,6 +67,18 @@ class Regression:
         return join(self.data_root, file_name)
 
 
+    def check_if_hypothesis_is_ordered(self):
+        Hy = self.Hy
+        n, _ = Hy.shape
+        for i in range(1, n):
+            frame1, id1, x1, y1, w1, h1,conf1 = Hy[i-1]
+            frame2, id2, x2, y2, w2, h2,conf2 = Hy[i]
+            if frame2 < frame1:
+                return False
+        return True
+
+
+
     def get_weights(self):
         """ gets the weights
         """
@@ -83,13 +100,18 @@ class Regression:
         n, _ = Hy.shape
         delta_max=self.dmax
 
+        is_ordered = self.check_if_hypothesis_is_ordered()
 
-        gen = pairwise_features(self.root,delta_max,self.deep_matching_binary,self.dm_data_loc)
+
+        gen = pairwise_features(
+            self.root,delta_max,
+            self.deep_matching_binary,
+            self.dm_data_loc,
+            DM_object=self.DM_object, reid_object=self.reid_object)
 
         #pairwise_vectors = [[] for _ in range(delta_max)]
         #labels = [[] for _ in range(delta_max)]
         i_start, pairwise_vectors, labels = self.restore_features()
-
 
         for i in range(i_start, n):
             frame1, id1, x1, y1, w1, h1,conf1 = Hy[i]
@@ -100,9 +122,14 @@ class Regression:
                 I2 = self.X[int(frame2-1)]
                 delta = int(abs(frame2-frame1) )
                 if delta >= delta_max :
-                    continue
+                    if is_ordered:
+                        break
+                    else:
+                        continue
 
                 try:
+                    i1 = i if self.is_memorized_reid else None
+                    i2 = j if self.is_memorized_reid else None
                     pair_vec = gen.get_pairwise_vector(
                         video_name ,
                         I1, I2,
@@ -110,13 +137,18 @@ class Regression:
                         (x1, y1, w1, h1),
                         (x2, y2, w2, h2),
                         conf1,
-                        conf2)
+                        conf2,
+                        i1=i1, i2=i2)
 
                     assert delta < delta_max, "delta too big:" + str(delta)
                     pairwise_vectors[delta].append(pair_vec)
                     labels[delta].append(1 if id1==id2 else 0)
-                except:
-                    print("ignore frame " + str(frame1) + " -> " + str(frame2))
+
+                except (KeyboardInterrupt, SystemExit):
+                    raise
+                except Exception as e:
+                    print("ignore frame " + str(frame1) + " -> " + str(frame2) \
+                        + ' because of ' + str(e))
                 #print ("same" if id1==id2 else "different")
             print("detection: ",i," out of ",n)
 
@@ -135,7 +167,7 @@ class Regression:
             #X = np.ones((n, count_features+1))
             #X[:,1:] = X_
             X = np.array( pairwise_vectors[i])
-            
+
             Y = np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)

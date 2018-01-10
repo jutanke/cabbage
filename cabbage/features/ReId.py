@@ -72,18 +72,72 @@ class StoredReId(ReId):
         ReId.__init__(self, root, True)
         self.dmax = dmax
         self.load_model(model_name, model_url)
+        self.Broken_pair = None
+        self.Prediction = None
+
 
     def create_key(self, i, j):
         return str(i) + ':' + str(j)
+
+
+    def set_mot16_11_dmax100_true_predictions3349(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-11_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-11_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-11_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-11_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_mot16_02_dmax100_true_predictions3105(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-02_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-02_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-02_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-02_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_load_model(self, fname1, fname2, url_predict, url_broken):
+        """
+        """
+        def load_if_not_there(fname, url):
+            if not isfile(fname):
+                with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+                    shutil.copyfileobj(res, f)
+
+        load_if_not_there(fname1, url_predict)
+        load_if_not_there(fname2, url_broken)
+        self.load_memory(fname1, fname2)
 
 
     def get_predictions_file(self, name):
         file_name = 'predict_' + name + '.npy'
         return join(self.root, file_name)
 
+
     def get_broken_file(self, name):
         file_name = 'broken_' + name + '.npy'
         return join(self.root, file_name)
+
+
+    def load_memory(self, pred_file, broken_file):
+        self.Broken_pair = np.load(broken_file)
+        self.Prediction = np.load(pred_file).item()
+
+
+    def predict(self, i, j):
+        assert self.Prediction is not None
+        assert self.Broken_pair is not None
+        key = self.create_key(i, j)
+        if key in self.Broken_pair:
+            return 0
+        elif key in self.Prediction:
+            return self.Prediction[key]
+        else:
+            raise Exception('Could not find pair ' + key)
 
 
     def memorize(self, Dt, X, name):
