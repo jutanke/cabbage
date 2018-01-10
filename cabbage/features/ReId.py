@@ -100,8 +100,10 @@ class StoredReId(ReId):
         self.set_load_model(fname1, fname2, url_predict, url_broken)
 
 
-    def set_load_model(self, fname1, fname2, ):
-        def load_if_not_there(fname, url, url_predict, url_broken):
+    def set_load_model(self, fname1, fname2, url_predict, url_broken):
+        """
+        """
+        def load_if_not_there(fname, url):
             if not isfile(fname):
                 with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
                     shutil.copyfileobj(res, f)
