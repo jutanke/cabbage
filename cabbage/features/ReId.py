@@ -72,8 +72,75 @@ class StoredReId(ReId):
         ReId.__init__(self, root, True)
         self.dmax = dmax
         self.load_model(model_name, model_url)
+        self.Broken_pair = None
+        self.Prediction = None
 
-    def memorize(self, Dt, X):
+
+    def create_key(self, i, j):
+        return str(i) + ':' + str(j)
+
+
+    def set_mot16_11_dmax100_true_predictions3349(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-11_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-11_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-11_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-11_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_mot16_02_dmax100_true_predictions3105(self):
+        """
+        """
+        url_predict = 'http://188.138.127.15:81/models/predict_MOT16-02_dmax100.npy'
+        url_broken = 'http://188.138.127.15:81/models/broken_MOT16-02_dmax100.npy'
+        fname1 = join(self.root, 'predict_MOT16-02_dmax100.npy')
+        fname2 = join(self.root, 'broken_MOT16-02_dmax100.npy')
+        self.set_load_model(fname1, fname2, url_predict, url_broken)
+
+
+    def set_load_model(self, fname1, fname2, url_predict, url_broken):
+        """
+        """
+        def load_if_not_there(fname, url):
+            if not isfile(fname):
+                with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+                    shutil.copyfileobj(res, f)
+
+        load_if_not_there(fname1, url_predict)
+        load_if_not_there(fname2, url_broken)
+        self.load_memory(fname1, fname2)
+
+
+    def get_predictions_file(self, name):
+        file_name = 'predict_' + name + '.npy'
+        return join(self.root, file_name)
+
+
+    def get_broken_file(self, name):
+        file_name = 'broken_' + name + '.npy'
+        return join(self.root, file_name)
+
+
+    def load_memory(self, pred_file, broken_file):
+        self.Broken_pair = np.load(broken_file)
+        self.Prediction = np.load(pred_file).item()
+
+
+    def predict(self, i, j):
+        assert self.Prediction is not None
+        assert self.Broken_pair is not None
+        key = self.create_key(i, j)
+        if key in self.Broken_pair:
+            return 0
+        elif key in self.Prediction:
+            return self.Prediction[key]
+        else:
+            raise Exception('Could not find pair ' + key)
+
+
+    def memorize(self, Dt, X, name):
         """
             Dt: {np.array} [(frame, x, y, w, h, score), ..]
             X: {np.array} (n, w, h, 3) video
@@ -81,9 +148,9 @@ class StoredReId(ReId):
         n, _ = Dt.shape
         dmax = self.dmax
 
-        Left, Right = [], []
-        Left_indx, Right_indx = [], []
+
         Broken_pair = []
+        Prediction = {}
 
         for i in range(n):
             frame1, x,y,w,h, _ = Dt[i]
@@ -96,17 +163,28 @@ class StoredReId(ReId):
                 if delta < dmax:
                     bb2 = (x,y,w,h)
                     I2 = X[int(frame2-1)]
+                    keyA, keyB = self.create_key(i, j), self.create_key(j, i)
+                    assert keyA not in Prediction and keyB not in Prediction
                     try:
-                        Left.append(get_element(I1, bb1, (64,64), force_uint=True))
-                        Right.append(get_element(I2, bb2, (64,64), force_uint=True))
-                        Left_indx.append(i)
-                        Right_indx.append(j)
+                        a = get_element(I1, bb1, (64,64), force_uint=True)
+                        b = get_element(I2, bb2, (64,64), force_uint=True)
+                        pred = StackNet64x64.predict(self, a, b)
+                        Prediction[keyA] = pred
+                        Prediction[keyB] = pred
                     except:
-                        Broken_pair.append((i,j))
-                        Broken_pair.append((j,i))
+                        Broken_pair.append(keyA)
+                        Broken_pair.append(keyB)
 
             print('handled ' + str(i) + " out of " + str(n))
-            
+
+        fname = self.get_predictions_file(name)
+        fname_broken = self.get_broken_file(name)
+        self.Broken_pair = set(Broken_pair)
+        self.Prediction = Prediction
+
+        np.save(fname, Prediction)
+        np.save(fname_broken, self.Broken_pair)
+
 
 
 class StackNet64x64(ReId):
@@ -137,15 +215,3 @@ class StackNet64x64(ReId):
         X = preprocess_input(X.astype('float64'))
 
         return ReId.predict(self, X)
-
-
-def predict_stacknet64x64(A1, A2):
-    """ predicts the probability that bb1 and bb2 are the
-        same image in X
-
-        A1: {image}
-        A2: {image}
-    """
-
-
-    x,y,w,h = bb1

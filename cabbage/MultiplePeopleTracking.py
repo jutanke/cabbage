@@ -11,7 +11,9 @@ class GraphGenerator:
     """
 
 
-    def __init__(self, root, video, detections, dmax, W, d=None, video_name=None):
+    def __init__(self, root, video, detections, dmax, W, d=None,
+        video_name=None, DM_object=None, reid_object=None,
+        is_memorized_reid=False):
         """
             root: {string} path to data root
             detections: {np.array} ([f, x, y, w, h, score], ...)
@@ -39,11 +41,14 @@ class GraphGenerator:
             makedirs(data_loc)
 
         n, _ = self.detections.shape
-        #n= 200
+        n= 100
         edges = []
         lifted_edges = []
 
-        gen = pairwise_features(self.root,dmax)
+        ALL_EDGES = []
+
+        gen = pairwise_features(self.root,dmax,
+            DM_object=DM_object, reid_object=reid_object)
 
         #for i, entry in enumerate(self.detections):
         for i in range(n):
@@ -58,6 +63,8 @@ class GraphGenerator:
                 I2 = self.X[int(frame2-1)]
 
                 try:
+                    i1 = i if is_memorized_reid else None
+                    i2 = j if is_memorized_reid else None
                     vec = gen.get_pairwise_vector(
                             video_name ,
                             I1, I2,
@@ -65,15 +72,12 @@ class GraphGenerator:
                             (x1, y1, w1, h1),
                             (x2, y2, w2, h2),
                             conf1,
-                            conf2)
+                            conf2,
+                            i1=i1, i2=i2)
 
-                    #print (vec)
-                    
                     cost = -1*(W[delta]@np.array(vec))
-                    #print (cost)
-                    
+
                     if delta > d:
-                        #print (delta,d,cost)
                         if (cost > 0):
                             # lifted edge
                             lifted_edges.append((i,j,cost))
@@ -95,9 +99,6 @@ class GraphGenerator:
         print('Lifted Edges', lifted_edges.shape)
 
         fmt = '%d %d %f'
-
-        with open('config.txt', 'w+') as f:
-            print(str(n), file=f)
 
         np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
         np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)

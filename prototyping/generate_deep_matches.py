@@ -51,7 +51,7 @@ else:
     makedirs(folder_name)
     start_i = 0
 
-    
+
 #TOTAL = []
 for i in range(start_i, len(frames)):
     curr_frame = []
@@ -59,6 +59,6 @@ for i in range(start_i, len(frames)):
         print("solve " + str(i) + " -> " + str(j))
         M = deepmatch(frames[i], frames[j])
         curr_frame.append(M)
-    
+
     fname = "f" + "%06d" % (i+1,) + '.npy'
     np.save(join(folder_name, fname), np.array(curr_frame))
