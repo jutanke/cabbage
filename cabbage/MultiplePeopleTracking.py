@@ -64,7 +64,6 @@ class GraphGenerator:
                 delta = int(abs(frame2-frame1) )
                 if delta >= dmax :
                     if is_ordered:
-                        print('break')
                         break
                     else:
                         continue
@@ -110,10 +109,14 @@ class GraphGenerator:
         print('Edges', edges.shape)
         print('Lifted Edges', lifted_edges.shape)
 
-        fmt = '%d %d %f'
 
+        with open('config.txt', 'w+') as f:
+            print(str(n), file=f)
+
+        fmt = '%d %d %f'
         np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
         np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)
+
 
 
     # def check_if_detections_are_ordered(self, detections):
