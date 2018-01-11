@@ -130,21 +130,21 @@ class MOT16_Experiments:
         self.mot16_11_color_lookup = color_lookups_per_video[1]
 
 
-    def get_MOT16_02_gt_trajectories(self):
+    def get_MOT16_02_gt_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_02_gt_bbs)
+            self.mot16_02_gt_bbs, as_point)
 
-    def get_MOT16_02_trajectories(self):
+    def get_MOT16_02_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_02_true_detections)
+            self.mot16_02_true_detections, as_point)
 
-    def get_MOT16_11_gt_trajectories(self):
+    def get_MOT16_11_gt_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_11_gt_bbs)
+            self.mot16_11_gt_bbs, as_point)
 
-    def get_MOT16_11_trajectories(self):
+    def get_MOT16_11_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_11_true_detections)
+            self.mot16_11_true_detections, as_point)
 
 
     def get_detections_as_trajectories(self, true_detections, as_point=False):
