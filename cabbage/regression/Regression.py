@@ -170,7 +170,7 @@ class Regression:
             #X[:,1:] = X_
             X = np.array( pairwise_vectors[i])
 
-            Y = np.array(labels[i])
+            Y = 1 - np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)
 
