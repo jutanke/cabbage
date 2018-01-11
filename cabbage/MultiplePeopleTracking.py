@@ -3,6 +3,8 @@ from time import time
 from os import makedirs, listdir, remove
 from os.path import join, isfile, isdir, exists, splitext
 from cabbage.features.GenerateFeatureVector import pairwise_features
+from cabbage.data.video import VideoData
+
 
 from time import time
 
@@ -24,7 +26,7 @@ class GraphGenerator:
         if d is None:
             d = int(dmax/2)
         assert dmax > d
-        assert W.shape[0] == dmax
+        #assert W.shape[0] == dmax
 
         if video_name is None:
             video_name = "video" + str(time)
@@ -41,14 +43,17 @@ class GraphGenerator:
             makedirs(data_loc)
 
         n, _ = self.detections.shape
-        n= 100
         edges = []
         lifted_edges = []
 
         ALL_EDGES = []
 
-        gen = pairwise_features(self.root,dmax,
+        gen = pairwise_features(self.root,None,
             DM_object=DM_object, reid_object=reid_object)
+
+        vd = VideoData(detections)
+        is_ordered = vd.is_ordered
+        #is_ordered = self.check_if_detections_are_ordered(detections)
 
         #for i, entry in enumerate(self.detections):
         for i in range(n):
@@ -58,7 +63,10 @@ class GraphGenerator:
                 frame2, x2, y2, w2, h2,conf2 = detections[j]
                 delta = int(abs(frame2-frame1) )
                 if delta >= dmax :
-                    continue
+                    if is_ordered:
+                        break
+                    else:
+                        continue
 
                 I2 = self.X[int(frame2-1)]
 
@@ -75,7 +83,7 @@ class GraphGenerator:
                             conf2,
                             i1=i1, i2=i2)
 
-                    cost = -1*(W[delta]@np.array(vec))
+                    cost = -1 * (W[delta]@np.array(vec))
 
                     if delta > d:
                         if (cost > 0):
@@ -85,8 +93,11 @@ class GraphGenerator:
                         # normal edge
                         edges.append((i,j,cost))
 
-                except:
-                    print("ignore frame " + str(frame1) + " -> " + str(frame2))
+                except (KeyboardInterrupt, SystemExit):
+                    raise
+                except Exception as e:
+                    print("ignore frame " + str(frame1) + " -> " + str(frame2) \
+                        +' because ' + str(e) + ' ... delta:' + str(delta))
                 #print('cost:', cost)
                 #cost = 10 if pid == pid_o else -1
             print("edges for detection: ",i," out of ",n)
@@ -98,11 +109,26 @@ class GraphGenerator:
         print('Edges', edges.shape)
         print('Lifted Edges', lifted_edges.shape)
 
-        fmt = '%d %d %f'
 
+        with open('config.txt', 'w+') as f:
+            print(str(n), file=f)
+
+        fmt = '%d %d %f'
         np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
         np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)
 
+
+
+    # def check_if_detections_are_ordered(self, detections):
+    #     """ Yields true if the list of detections is ordered
+    #     """
+    #     n, _ = detections.shape
+    #     for i in range(1, n):
+    #         frame1, x1, y1, w1, h1,conf1 = detections[i-1]
+    #         frame2, x2, y2, w2, h2,conf2 = detections[i]
+    #         if frame2 < frame1:
+    #             return False
+    #     return True
 
     def get_data_folder(self):
         """ gets the data directory

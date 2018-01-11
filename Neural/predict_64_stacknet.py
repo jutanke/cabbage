@@ -11,7 +11,7 @@ from os.path import join, isfile, isdir, exists, splitext
 import numpy as np
 
 root = Settings['data_root']
-filepath = join(root, 'stacknet__big64model.h5')
+filepath = join(root, 'stacknet_64x64_model.h5')
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint, TerminateOnNaN()]
 

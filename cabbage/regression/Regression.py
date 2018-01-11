@@ -1,6 +1,8 @@
 import numpy as np
 from os import makedirs, listdir, remove
 from os.path import join, isfile, isdir, exists, splitext
+import urllib.request
+import shutil
 
 from cabbage.features.GenerateFeatureVector import pairwise_features
 from cabbage.features.ReId import StackNet64x64, get_element
@@ -168,7 +170,7 @@ class Regression:
             #X[:,1:] = X_
             X = np.array( pairwise_vectors[i])
 
-            Y = np.array(labels[i])
+            Y = 1 - np.array(labels[i])
             w = LR.get_params(X,Y)
             weights.append(w)
 
@@ -241,6 +243,31 @@ class Regression:
                 np.save(fname, v)
                 np.save(fname_label, l)
 
+
+def get_W_mot16_02_dmax100(root):
+    """ gets the parameters for the W
+    """
+    url = 'http://188.138.127.15:81/models/theta_mot16_02_dmax100.npy'
+    fname = 'theta_mot16_02_dmax100.npy'
+    fname = join(root, fname)
+    if not isfile(fname):
+        with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+            shutil.copyfileobj(res, f)
+    W = np.load(fname)
+    return W
+
+
+def get_W_mot16_02_dmax60(root):
+    """ gets the parameters for the W
+    """
+    url = 'http://188.138.127.15:81/models/theta_mot16_02_dmax60.npy'
+    fname = 'theta_mot16_02_dmax60.npy'
+    fname = join(root, fname)
+    if not isfile(fname):
+        with urllib.request.urlopen(url) as res, open(fname, 'wb') as f:
+            shutil.copyfileobj(res, f)
+    W = np.load(fname)
+    return W
 
 
 # --

@@ -20,8 +20,8 @@ from cabbage.data.MOT16Sampler import MOT16Sampler
 
 root = Settings['data_root']
 model_root = join(root, 'good_models')
-filepath = join(model_root, 'stacknet64x64_84acc.h5')
-#filepath = join(root, 'stacknet_64x64_model.h5')
+#filepath = join(model_root, 'stacknet64x64_84acc.h5')
+filepath = join(root, 'stacknet_64x64_model.h5')
 checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
 callbacks_list = [checkpoint, TerminateOnNaN()]
 
@@ -35,13 +35,10 @@ model.summary()
 #sampler = ReId.DataSampler(root,64,64)
 sampler = MOT16Sampler(root, (64, 64))
 
-X, Y = sampler.get_named_batch('MOT16-02', 5, 10)
+X, Y = sampler.get_named_batch('MOT16-02', 1000, 4000)
 X = preprocess_input(X.astype('float64'))
 
 Y_ = model.predict(X)
-
-print("Y_", Y_)
-print("Y", Y)
 
 #Y_clipped = (Y_[:,0] > 0.5) * 1
 #Yclipped =  (Y[:,0] > 0.5) * 1
