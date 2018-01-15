@@ -4,6 +4,7 @@ from os import makedirs, listdir, remove
 from os.path import join, isfile, isdir, exists, splitext
 from cabbage.features.GenerateFeatureVector import pairwise_features
 from cabbage.data.video import VideoData
+from time import time
 
 
 from time import time
@@ -59,6 +60,7 @@ class GraphGenerator:
 
         #for i, entry in enumerate(self.detections):
         for i in range(start_i+1, n):
+            __START = time()
             frame1, x1, y1, w1, h1,conf1 = detections[i]
             I1 = self.X[int(frame1-1)]
             for j in range(i+1, n):
@@ -102,7 +104,9 @@ class GraphGenerator:
                         +' because ' + str(e) + ' ... delta:' + str(delta))
                 #print('cost:', cost)
                 #cost = 10 if pid == pid_o else -1
+            __END = time()
             print("edges for detection: ",i," out of ",n)
+            print("\t\telapsed:", __END - __START)
 
             # --- store the data ---
             self.save_edges(i, data_loc, edges, lifted_edges)
