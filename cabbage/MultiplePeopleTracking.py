@@ -43,8 +43,10 @@ class GraphGenerator:
             makedirs(data_loc)
 
         n, _ = self.detections.shape
-        edges = []
-        lifted_edges = []
+        #edges = []
+        #lifted_edges = []
+
+        start_i, edges, lifted_edges = self.load_edges(data_loc)
 
         ALL_EDGES = []
 
@@ -56,7 +58,7 @@ class GraphGenerator:
         #is_ordered = self.check_if_detections_are_ordered(detections)
 
         #for i, entry in enumerate(self.detections):
-        for i in range(n):
+        for i in range(start_i+1, n):
             frame1, x1, y1, w1, h1,conf1 = detections[i]
             I1 = self.X[int(frame1-1)]
             for j in range(i+1, n):
@@ -102,6 +104,15 @@ class GraphGenerator:
                 #cost = 10 if pid == pid_o else -1
             print("edges for detection: ",i," out of ",n)
 
+            # --- store the data ---
+            self.save_edges(i, data_loc, edges, lifted_edges)
+
+            edge_OLD, lifted_edges_OLD = self.get_backup_file_names(i-1, data_loc)
+            if isfile(edge_OLD):
+                remove(edge_OLD)
+            if isfile(lifted_edges_OLD):
+                remove(lifted_edges_OLD)
+
 
         edges = np.array(edges)
         lifted_edges = np.array(lifted_edges)
@@ -117,6 +128,53 @@ class GraphGenerator:
         np.savetxt('edges.txt', edges, delimiter=';', fmt=fmt)
         np.savetxt('lifted_edges.txt', lifted_edges, delimiter=';', fmt=fmt)
 
+
+    def get_backup_file_names(self, i, backup_loc):
+        """
+        """
+        edge_file = join(backup_loc, "edges_%06d" % (i,) + '.npy')
+        lifted_edge_file = join(backup_loc, "lifted_edges_%06d" % (i,) + '.npy')
+        return edge_file, lifted_edge_file
+
+
+    def get_i(self, backup_loc):
+        edges = sorted([f for f in listdir(backup_loc) if
+            f.startswith('edges') and f.endswith('.npy')])
+        if len(edges) > 0:
+            last_edge = edges[-1]
+            return int(last_edge[6:12])
+        else:
+            return -1
+
+
+    def load_edges(self, backup_loc):
+        """
+        """
+        i = self.get_i(backup_loc)
+        if i > 0:
+            edge_file, lifted_edge_file = self.get_backup_file_names(i, backup_loc)
+            assert isfile(edge_file)
+            edges = np.load(edge_file).tolist()
+
+            if isfile(lifted_edge_file):
+                lifted_edges = np.load(lifted_edge_file).tolist()
+
+        else:
+            edges = []
+            lifted_edges = []
+
+        return i, edges, lifted_edges
+
+
+    def save_edges(self, i, backup_loc, edges, lifted_edges):
+        """
+        """
+        edge_file, lifted_edge_file = self.get_backup_file_names(i, backup_loc)
+        assert len(edges) > 0
+        np.save(edge_file, edges)
+
+        if len(lifted_edges) > 0:
+            np.save(lifted_edge_file, lifted_edges)
 
 
     # def check_if_detections_are_ordered(self, detections):
