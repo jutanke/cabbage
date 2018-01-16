@@ -43,6 +43,10 @@ class ReId:
         return Y[0][0]
 
 
+    def predict_raw(self, X):
+        return self.model.predict(X)
+
+
     def load_model(self, model_name, model_url):
         """ loads a model if it is not found
         """
@@ -66,12 +70,15 @@ class StoredReId(ReId):
     """ Stores the exact prediction
     """
 
-    def __init__(self, root, dmax):
-        model_name = 'stacknet64x64_84_BOTH.h5'
-        model_url = 'http://188.138.127.15:81/models/stacknet64x64_84_BOTH.h5'
+    def __init__(self, root, dmax, nomodel=False):
         ReId.__init__(self, root, True)
+
+        if not nomodel:
+            model_name = 'stacknet64x64_84_BOTH.h5'
+            model_url = 'http://188.138.127.15:81/models/stacknet64x64_84_BOTH.h5'
+            self.load_model(model_name, model_url)
+
         self.dmax = dmax
-        self.load_model(model_name, model_url)
         self.Broken_pair = None
         self.Prediction = None
 
@@ -98,7 +105,7 @@ class StoredReId(ReId):
         fname1 = join(self.root, 'predict_MOT16-02_dmax100.npy')
         fname2 = join(self.root, 'broken_MOT16-02_dmax100.npy')
         self.set_load_model(fname1, fname2, url_predict, url_broken)
-
+        
 
     def set_load_model(self, fname1, fname2, url_predict, url_broken):
         """
@@ -138,6 +145,23 @@ class StoredReId(ReId):
             return self.Prediction[key]
         else:
             raise Exception('Could not find pair ' + key)
+
+
+    def batch_memorize(self, I, J, X):
+        """
+        I: {np.array} list of i's
+        J: {np.array} list of j's
+        """
+        if self.Prediction is None:
+            self.Prediction = {}
+        assert I.shape[0] == J.shape[0]
+        assert I.shape[0] == X.shape[0]
+        y = ReId.predict_raw(self, X)[:,0]
+        for indx, (i, j, pred) in enumerate(zip(I, J, y)):
+            keyA, keyB = self.create_key(i, j), self.create_key(j, i)
+            assert keyA not in self.Prediction and keyB not in self.Prediction
+            self.Prediction[keyA] = pred
+            self.Prediction[keyB] = pred
 
 
     def memorize(self, Dt, X, name):
@@ -184,6 +208,14 @@ class StoredReId(ReId):
 
         np.save(fname, Prediction)
         np.save(fname_broken, self.Broken_pair)
+
+    def save(self, name):
+        fname = self.get_predictions_file(name)
+        np.save(fname, self.Prediction)
+
+        if self.Broken_pair is not None:
+            fname_broken = self.get_broken_file(name)
+            np.save(fname_broken, self.Broken_pair)
 
 
 
