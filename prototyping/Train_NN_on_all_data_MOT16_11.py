@@ -14,6 +14,7 @@ from cabbage.features.ReId import StoredReId, StackNet64x64, get_element
 from experiments import MOT16_Experiments
 from cabbage.data.video import VideoData
 from time import time
+from keras.applications.vgg16 import preprocess_input
 
 print("\n")
 
@@ -77,8 +78,8 @@ for i in range(0, end, 500):
     PAIRS = np.array(ALL_PAIRS[i:i+500])
     a = PAIRS[:,0]
     b = PAIRS[:,1]
-    A = Im[a]
-    B = Im[b]
+    A = preprocess_input(Im[a].astype('float64'))
+    B = preprocess_input(Im[b].astype('float64'))
     X = np.concatenate([A, B], 3)    
     reid.batch_memorize(a, b, X)
     print('run batch from ' + str(i) + ' to ' + str(i+500))
