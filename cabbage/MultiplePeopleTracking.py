@@ -128,9 +128,18 @@ class BatchGraphGenerator:
             i,j = batch[:,0],batch[:,1]
             aabb_j, Im_j, scores_j, frame_j = lookup[j]
             aabb_i, Im_i, scores_i, frame_i = lookup[i]
+
+            delta = frame_j - frame_i
+            IN_RANGE = (delta < dmax).nonzero()
+            delta = delta[IN_RANGE]
+
+            aabb_j, aabb_i = aabb_j[IN_RANGE], aabb_i[IN_RANGE]
+            scores_i, scoresj = scores_i[IN_RANGE], scores_j[IN_RANGE]
+            frame_i, framej = frame_i[IN_RANGE], frame_j[IN_RANGE]
+
             Im_j, Im_i = \
-                preprocess_input(Im_j.astype('float64')), \
-                preprocess_input(Im_i.astype('float64'))
+                preprocess_input(Im_j[IN_RANGE].astype('float64')), \
+                preprocess_input(Im_i[IN_RANGE].astype('float64'))
 
             SCORES = np.where(scores_j < scores_i, scores_j, scores_i)
 
@@ -147,6 +156,15 @@ class BatchGraphGenerator:
 
             Bias = np.ones(ST.shape)
 
+            # delta = delta[IN_RANGE]
+            # Bias = Bias[IN_RANGE]
+            # ST = ST[IN_RANGE]
+            # DM = DM[IN_RANGE]
+            # Y = Y[IN_RANGE]
+            # SCORES = SCORES[IN_RANGE]
+
+            assert np.min(delta) >= 0
+
             F = np.array([
                 Bias,
                 ST, DM, Y, SCORES,
@@ -155,9 +173,6 @@ class BatchGraphGenerator:
                 Y**2, Y * SCORES,
                 SCORES**2
             ]).T
-
-            delta = frame_j - frame_i
-            assert np.min(delta) >= 0
 
             edge_weights = np.einsum('ij,ij->i', F, W[delta])
 
