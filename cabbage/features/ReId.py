@@ -8,20 +8,26 @@ from keras.models import load_model
 from keras.applications.vgg16 import preprocess_input
 
 
-def get_element(X, bb, shape, force_uint=False):
+def get_element(X, bb, shape, force_uint=False, preprocess=False):
     """ returns the bounding box area from the image X
     """
     x,y,w,h = bb
     x,y,w,h = int(x),int(y),int(w),int(h)
+
+    I = X[y:y+h,x:x+w]
+    if preprocess:
+        I = preprocess_input(I)
+
     if force_uint:
-        I = resize(X[y:y+h,x:x+w], shape, mode='constant').copy()
+
+        I = resize(I, shape, mode='constant').copy()
         if I.dtype != np.uint8:
             if np.max(I) < 1.01:
                 I *= 255
                 I = I.astype('uint8')
         return I
     else:
-        return resize(X[y:y+h,x:x+w], shape, mode='constant')
+        return resize(I, shape, mode='constant')
 
 
 class ReId:
@@ -105,7 +111,7 @@ class StoredReId(ReId):
         fname1 = join(self.root, 'predict_MOT16-02_dmax100.npy')
         fname2 = join(self.root, 'broken_MOT16-02_dmax100.npy')
         self.set_load_model(fname1, fname2, url_predict, url_broken)
-        
+
 
     def set_load_model(self, fname1, fname2, url_predict, url_broken):
         """
