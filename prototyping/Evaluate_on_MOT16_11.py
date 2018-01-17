@@ -19,7 +19,7 @@ print("\n")
 reid = StackNet64x64(root)
 dm = ReadOnlyDeepMatching(root, 100)  # deep matches are set-up for 100 frames
 
-dmax = 100
+dmax = 30
 
 
 mot16 = MOT16_Experiments(root)

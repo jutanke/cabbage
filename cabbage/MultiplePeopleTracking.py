@@ -134,7 +134,7 @@ class BatchGraphGenerator:
             delta = delta[IN_RANGE]
 
             aabb_j, aabb_i = aabb_j[IN_RANGE], aabb_i[IN_RANGE]
-            scores_i, scoresj = scores_i[IN_RANGE], scores_j[IN_RANGE]
+            scores_i, scores_j = scores_i[IN_RANGE], scores_j[IN_RANGE]
             frame_i, framej = frame_i[IN_RANGE], frame_j[IN_RANGE]
 
             Im_j, Im_i = \
