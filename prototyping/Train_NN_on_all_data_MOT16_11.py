@@ -62,9 +62,9 @@ for frame_i, ids_in_frame in enumerate(IDS_IN_FRAME):
                 ALL_PAIRS.append((i,j))
         
         for frame_j in range(frame_i + 1, min(frame_i + dmax + 1, LAST_FRAME)):
-            if ALL_PAIRS[frame_j] is None:
+            if IDS_IN_FRAME[frame_j] is None:
                 continue
-            for j in ALL_PAIRS[frame_j]:
+            for j in IDS_IN_FRAME[frame_j]:
                 ALL_PAIRS.append((i, j))
     
     print('handle frame ' + str(frame_i) + " from " + str(LAST_FRAME))
