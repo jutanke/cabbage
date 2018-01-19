@@ -177,11 +177,12 @@ class BatchGraphGenerator:
             edge_weights = np.einsum('ij,ij->i', F, W[delta])
 
             for i, j, w, d in zip(i, j, edge_weights, delta):
-                txt = str(i) + " " + str(j) + " " + str(w) + "\n"
                 if d < lifted_edge_start:
+                    txt = str(i) + " " + str(j) + " " + str(w) + "\n"
                     EDGE_FILE.write(txt)
                     EDGE_FILE.flush()
                 else:
+                    txt = str(i) + " " + str(j) + " " + str(max(w, 0)) + "\n"
                     LIFTED_EDGE_FILE.write(txt)
                     LIFTED_EDGE_FILE.flush()
 
