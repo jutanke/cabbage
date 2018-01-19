@@ -21,6 +21,12 @@ pip install git+https://github.com/justayak/cselect.git
 pip install git+https://github.com/justayak/pppr.git
 ```
 
+### Download source tree
+Download the source code and its submodules using
+```bash
+git clone --recursive https://github.com/justayak/cabbage.git
+```
+
 
 
 ##### References
