@@ -64,6 +64,7 @@ class MOT16_Experiments:
         for X, Y_det, Y_gt in [mot16_02, mot16_11]:
             # --- run for each video ---
             # this is not the most efficient way but not important atm..
+            _, H, W, _ = X.shape
             Y_gt = MOT16.simplify_gt(Y_gt)
             gt_bbs = []
             all_detections = []
@@ -88,9 +89,11 @@ class MOT16_Experiments:
                     for ped_ in y_gt:
                         j, pid, l_gt, t_gt, w_gt, h_gt = ped_
                         assert(i == j)
-                        all_detections.append(
-                            np.array([i, l, t, w, h, score])
-                        )
+                        if l >= 0 and t >= 0 and l + w < W and \
+                            t + h < H:
+                            all_detections.append(
+                                np.array([i, l, t, w, h, score])
+                            )
                         if aabb.IoU((l,t,w,h), (l_gt,t_gt,w_gt,h_gt)) > 0.5:
                             true_detections.append(
                                 np.array([i, pid, l, t, w, h, score]))
@@ -130,21 +133,21 @@ class MOT16_Experiments:
         self.mot16_11_color_lookup = color_lookups_per_video[1]
 
 
-    def get_MOT16_02_gt_trajectories(self):
+    def get_MOT16_02_gt_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_02_gt_bbs)
+            self.mot16_02_gt_bbs, as_point)
 
-    def get_MOT16_02_trajectories(self):
+    def get_MOT16_02_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_02_true_detections)
+            self.mot16_02_true_detections, as_point)
 
-    def get_MOT16_11_gt_trajectories(self):
+    def get_MOT16_11_gt_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_11_gt_bbs)
+            self.mot16_11_gt_bbs, as_point)
 
-    def get_MOT16_11_trajectories(self):
+    def get_MOT16_11_trajectories(self, as_point=False):
         return self.get_detections_as_trajectories(
-            self.mot16_11_true_detections)
+            self.mot16_11_true_detections, as_point)
 
 
     def get_detections_as_trajectories(self, true_detections, as_point=False):
