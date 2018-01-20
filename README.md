@@ -13,22 +13,20 @@ Unofficial implementation of the paper[1]: [Multiple People Tracking by Lifted M
 
 ## Install
 
+The software is developed using Ubuntu 16.04 and OSX with Python 3.5.
 The following libraries and tools are needed for this software to work correctly:
 
 * **tensorflow** (1.x+)
 * **Keras** (2.x+)
-* **pak**: (handling of the dataset and evaluation scheme)
-```bash
-pip install git+https://github.com/justayak/pak.git
+
+### Install-Script
+When the above criterias are met a simple install routine can be called inside the
+source root
+```bash 
+bash install.sh
 ```
-* **cselect**: (generate n different colors for better visualization)
-```bash
-pip install git+https://github.com/justayak/cselect.git
-```
-* **pppr**: (helper functions for geometry)
-```bash
-pip install git+https://github.com/justayak/pppr.git
-```
+This script will create a text file called **settings.txt**. You will need this file when you are
+using the end-to-end algorithm.
 
 ### Download source tree
 Download the source code and its submodules using
