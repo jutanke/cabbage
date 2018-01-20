@@ -8,6 +8,9 @@ Unofficial implementation of the paper[1]: [Multiple People Tracking by Lifted M
 * [Execute Code](https://github.com/justayak/cabbage#execute-code): how to run the code
   * [DeepMatching](https://github.com/justayak/cabbage#generate-deep-matches): how to generate DeepMatching for your video
 
+![mot16_11](https://user-images.githubusercontent.com/831215/35177494-17453dea-fd80-11e7-92b4-859dde2d6e71.png)
+*Tracking calculated by this library on the MOT16-11 video using dmax=100*
+
 ## Install
 
 The following libraries and tools are needed for this software to work correctly:
