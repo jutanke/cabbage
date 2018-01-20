@@ -1,3 +1,6 @@
+deepmatching_bin/
+settings.txt
+
 .ipynb_*
 __pycache__/
 build/
