@@ -19,6 +19,12 @@ The following libraries and tools are needed for this software to work correctly
 * **tensorflow** (1.x+)
 * **Keras** (2.x+)
 
+### Download source tree
+Download the source code and its submodules using
+```bash
+git clone --recursive https://github.com/justayak/cabbage.git
+```
+
 ### Install-Script
 When the above criterias are met a simple install routine can be called inside the
 source root
@@ -27,12 +33,6 @@ bash install.sh
 ```
 This script will create a text file called **settings.txt**. You will need this file when you are
 using the end-to-end algorithm.
-
-### Download source tree
-Download the source code and its submodules using
-```bash
-git clone --recursive https://github.com/justayak/cabbage.git
-```
 
 ## Execute Code
 Follow this steps to do an end-to-end run on a video:
