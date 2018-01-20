@@ -27,7 +27,40 @@ Download the source code and its submodules using
 git clone --recursive https://github.com/justayak/cabbage.git
 ```
 
+## Execute Code
+Follow this steps to do an end-to-end run on a video:
 
 
-##### References
+### Generate Deep Matches
+Download the last DeepMatching Software from [TOTH](http://lear.inrialpes.fr/src/deepmatching/) and unzip it. 
+Build the binary using their instructions. **Important**: this operation might run for a long time!
+
+```python
+from cabbage.features.deepmatching import DeepMatching
+
+dmax = 100  # as described in the paper
+deep_matching_binary = '/path/to/TOTH/deep/matching/binary'
+data_loc = '/path/where/data/can/be/stored'
+
+dm = DeepMatching(deep_matching_binary, data_loc, dmax)
+
+# the video must be stored as a folder with images 
+video_folder = '/path/to/video/as/img'
+video_name = 'Some_Name'
+dm.generate_matches(video_folder, video_name)
+
+# query..
+# usually, you would not need to do this as it is
+# handled within the application
+frame1 = 1
+bb1 = (10, 10, 10, 50)  # (top-x, top-y, w, h)
+
+frame2 = 3
+bb2 = (11, 13, 12, 53)  # (top-x, top-y, w, h)
+
+cost = dm.calculate_cost(video_name, frame1, bb1, frame2, bb2)
+
+```
+
+# References
 Icon made by Smashicons from www.flaticon.com
