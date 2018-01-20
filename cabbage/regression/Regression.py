@@ -244,6 +244,15 @@ class Regression:
                 np.save(fname_label, l)
 
 
+def get_default_W(root, dmax):
+    """ gets the default parameter for W trained on MOT16-02
+        The maximum dmax is 100
+    """
+    assert dmax <= 100, 'cannot use larger dmax than 100!'
+    W = get_W_mot16_02_dmax100(root)
+    return W[0:dmax,]
+
+
 def get_W_mot16_02_dmax100(root):
     """ gets the parameters for the W
     """

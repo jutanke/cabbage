@@ -8,6 +8,60 @@ from cabbage.features.ReId import get_element
 from time import time
 from keras.applications.vgg16 import preprocess_input
 import cabbage.features.spatio as st
+from cabbage.regression.Regression import get_default_W
+from cabbage.features.deepmatching import ReadOnlyDeepMatching
+from cabbage.features.ReId import StackNet64x64
+from cabbage.features.deepmatching import DeepMatching
+import json
+import subprocess
+
+
+def execute_multiple_people_tracking(video_folder, X, Dt, video_name, dmax, settings_file,
+    batch_size=700):
+    """ this function runs the code end-to-end
+
+        video_folder: {string} location where the video frames are stored as images
+        X: {np.array} (n,h,w,3) video data
+        Dt: {np.array} (m,6) detections [ (frame, x, y, w, h, score), ... ]
+        video_name: {string} name of the video (can be any string, this is used
+                             to later re-identify the data
+        settings_file: {string} location of the settings file
+        batch_size: {int} how large the chunks of pairs are that are processed
+                            at the same time. Small values work on CPU's as well.
+    """
+    assert dmax <= 100, 'Currently no larger dmax value than 100 is allowed!'
+    assert len(X.shape) == 4 and X.shape[3] == 3
+    assert len(Dt.shape) == 2 and Dt.shape[1] == 6
+    assert isdir(video_folder)
+    assert isfile(settings_file)
+
+    Settings = json.load(open(settings_file))
+
+    data_root = Settings['data_root']
+    deep_matching_binary = Settings['deepmatch']
+    graph_solver = Settings['graph_solver']
+
+    assert isfile(deep_matching_binary), 'the deepmatching binary must exist'
+
+    if not isdir(data_root):
+        makedirs(data_root)
+
+    W = get_default_W(data_root, dmax)
+
+    dm = DeepMatching(deep_matching_binary, data_root, dmax)
+    dm.generate_matches(video_folder, video_name)
+
+    reid = StackNet64x64(root)
+
+    gg = BatchGraphGenerator(data_root, reid, dm, dmax, video_name)
+    gg.build(Dt, X, W, batch_size=batch_size)
+    edge_file, lifted_edge_file, config_file = gg.get_file_names()
+    output_file = join(data_root, 'output.txt')
+
+    args = (graph_solver, edge_file, lifted_edge_file, config_file, output_file)
+    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+    popen.wait()
+
 
 
 class AABBLookup:
@@ -117,10 +171,12 @@ class BatchGraphGenerator:
         video_name = self.video_name
 
 
-        edge_file, lifted_edge_file = self.get_file_names()
+        edge_file, lifted_edge_file, config_file = self.get_file_names()
         EDGE_FILE = open(edge_file, "w")
         LIFTED_EDGE_FILE = open(lifted_edge_file, "w")
 
+        with open(config_file, 'w+') as f:
+            print(str(n), file=f)
 
         for _i in range(0, len(ALL_PAIRS), batch_size):
             __start = time()
@@ -200,7 +256,8 @@ class BatchGraphGenerator:
         """
         edge_file = join(self.data_loc, "edges.txt")
         lifted_edge_file = join(self.data_loc, "lifted_edges.txt")
-        return edge_file, lifted_edge_file
+        config_file = join(self.data_loc, "config.txt")
+        return edge_file, lifted_edge_file, config_file
 
 
 
