@@ -9,6 +9,11 @@ from time import time
 from keras.applications.vgg16 import preprocess_input
 import cabbage.features.spatio as st
 
+def execute_multiple_people_tracking():
+    """ this function runs the code end-to-end
+    """
+    pass
+
 
 class AABBLookup:
     """ helper function to easier map the AABB's
