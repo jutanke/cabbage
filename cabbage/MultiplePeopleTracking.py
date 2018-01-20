@@ -233,6 +233,7 @@ class BatchGraphGenerator:
             edge_weights = np.einsum('ij,ij->i', F, W[delta])
 
             for i, j, w, d in zip(i, j, edge_weights, delta):
+                w = -1 * w
                 if d < lifted_edge_start:
                     txt = str(i) + " " + str(j) + " " + str(w) + "\n"
                     EDGE_FILE.write(txt)
