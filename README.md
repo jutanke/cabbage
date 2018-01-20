@@ -1,7 +1,12 @@
 ![cabbage](https://user-images.githubusercontent.com/831215/32352134-3af56ab4-c020-11e7-8a6f-4476a25c6626.png)
 # cabbage
 
-Implementation of the paper: [Multiple People Tracking by Lifted Multicut and Person Re-identification](http://openaccess.thecvf.com/content_cvpr_2017/papers/Tang_Multiple_People_Tracking_CVPR_2017_paper.pdf)
+Implementation of the paper[1]: [Multiple People Tracking by Lifted Multicut and Person Re-identification](http://openaccess.thecvf.com/content_cvpr_2017/papers/Tang_Multiple_People_Tracking_CVPR_2017_paper.pdf)
+
+## Overview
+* [Install](https://github.com/justayak/cabbage#install): tools needed for running the application
+* [Execute Code](https://github.com/justayak/cabbage#execute-code): how to run the code
+  * [DeepMatching](https://github.com/justayak/cabbage#generate-deep-matches): how to generate DeepMatching for your video
 
 ## Install
 
@@ -65,3 +70,5 @@ cost = dm.calculate_cost(video_name, frame1, bb1, frame2, bb2)
 
 # References
 Icon made by Smashicons from www.flaticon.com
+
+[1] Tang, Siyu, et al. "Multiple people tracking by lifted multicut and person re-identification." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2017.
