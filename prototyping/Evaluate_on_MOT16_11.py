@@ -28,7 +28,7 @@ X = mot16.mot16_11_X
 
 Dt = mot16.mot16_11_detections
 vd = VideoData(Dt)
-Dt = vd.get_n_first_frames(100)
+#Dt = vd.get_n_first_frames(100)
 
 W = get_W_mot16_02_dmax100(root)
 
