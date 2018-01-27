@@ -73,6 +73,8 @@ int main(int argc, char** argv) {
   while (fedges >> i) {
     fedges >> j;
     fedges >> ce;
+    if (i < count) break;
+    if (j < count) continue;
     original_graph.insertEdge(i, j);
     weights[lifted_graph.findEdge(i, j).second] = ce;
   }
@@ -80,6 +82,8 @@ int main(int argc, char** argv) {
   while (flifted_edges >> i) {
     flifted_edges >> j;
     flifted_edges >> ce;
+    if (i < count) break;
+    if (j < count) continue;
     weights[lifted_graph.findEdge(i, j).second] = ce;
   }
 

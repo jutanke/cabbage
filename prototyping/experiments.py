@@ -86,14 +86,14 @@ class MOT16_Experiments:
 
                 for ped in y_det:
                     i, _,l, t, w, h, score, _, _,_ = ped
+                    if l >= 0 and t >= 0 and l + w < W and \
+                        t + h < H:
+                        all_detections.append(
+                            np.array([i, l, t, w, h, score])
+                        )
                     for ped_ in y_gt:
                         j, pid, l_gt, t_gt, w_gt, h_gt = ped_
                         assert(i == j)
-                        if l >= 0 and t >= 0 and l + w < W and \
-                            t + h < H:
-                            all_detections.append(
-                                np.array([i, l, t, w, h, score])
-                            )
                         if aabb.IoU((l,t,w,h), (l_gt,t_gt,w_gt,h_gt)) > 0.5:
                             true_detections.append(
                                 np.array([i, pid, l, t, w, h, score]))
