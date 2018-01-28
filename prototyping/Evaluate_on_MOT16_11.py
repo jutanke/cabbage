@@ -10,7 +10,7 @@ from cabbage.regression.Regression import get_W_mot16_02_dmax100
 from cabbage.MultiplePeopleTracking import GraphGenerator, BatchGraphGenerator, AABBLookup
 from cabbage.features.deepmatching import ReadOnlyDeepMatching
 from cabbage.features.ReId import StoredReId, StackNet64x64, get_element
-from experiments import MOT16_Experiments
+from experiments import MOT16_Experiments, remove_negative_pairs
 from cabbage.data.video import VideoData
 from time import time
 root = Settings['data_root']
@@ -27,9 +27,11 @@ video_name = 'MOT16-11'
 X = mot16.mot16_11_X
 
 #Dt = mot16.mot16_11_detections
+H,W,_ = X[0].shape
 Dt = mot16.mot16_11_true_detections_no_pid
+Dt = remove_negative_pairs(Dt,W,H)
 vd = VideoData(Dt)
-#Dt = vd.get_n_first_frames(50)
+Dt = vd.get_n_first_frames(50)
 
 W = get_W_mot16_02_dmax100(root)
 
