@@ -31,7 +31,7 @@ H,W,_ = X[0].shape
 Dt = mot16.mot16_11_true_detections_no_pid
 Dt = remove_negative_pairs(Dt,W,H)
 vd = VideoData(Dt)
-Dt = vd.get_n_first_frames(50)
+#Dt = vd.get_n_first_frames(50)
 
 W = get_W_mot16_02_dmax100(root)
 
