@@ -98,33 +98,6 @@ class BatchGraphGenerator:
 
         n, _ = Dt.shape
 
-        #ALL_PAIRS = []
-        LAST_FRAME = X.shape[0]
-
-        # __start = time()
-        # for frame_i, ids_in_frame in enumerate(lookup.ids_in_frame):
-        #     if ids_in_frame is None:
-        #         continue
-        #
-        #     for i in ids_in_frame:
-        #         for j in ids_in_frame:
-        #             if i < j:
-        #                 ALL_PAIRS.append((i,j))
-        #
-        #         for frame_j in range(frame_i + 1, min(frame_i + dmax + 1, LAST_FRAME)):
-        #             if lookup.ids_in_frame[frame_j] is None:
-        #                 continue
-        #             for j in lookup.ids_in_frame[frame_j]:
-        #                 if j > i:
-        #                     ALL_PAIRS.append((i, j))
-        #
-        #     if frame_i % 100 == 0:
-        #         print('handle frame ' + str(frame_i) + " from " + str(LAST_FRAME))
-        #
-        # __end = time()
-        # ALL_PAIRS = np.array(ALL_PAIRS, 'int32')
-        # print("ALL PAIRS:", ALL_PAIRS.shape)
-        # print('\telapsed seconds:', __end - __start)
         ALL_PAIRS = lookup.get_all_pairs(dmax)
 
         reid = self.reid
@@ -142,55 +115,12 @@ class BatchGraphGenerator:
         for _i in range(0, len(ALL_PAIRS), batch_size):
             __start = time()
             batch = ALL_PAIRS[_i:_i+batch_size]
-            # i,j = batch[:,0],batch[:,1]
-            # aabb_j, Im_j, scores_j, frame_j = lookup[j]
-            # aabb_i, Im_i, scores_i, frame_i = lookup[i]
-            #
-            # delta = frame_j - frame_i
-            # IN_RANGE = (delta < dmax).nonzero()
-            # delta = delta[IN_RANGE]
-            #
-            # aabb_j, aabb_i = aabb_j[IN_RANGE], aabb_i[IN_RANGE]
-            # scores_i, scores_j = scores_i[IN_RANGE], scores_j[IN_RANGE]
-            # frame_i, framej = frame_i[IN_RANGE], frame_j[IN_RANGE]
-            #
-            # Im_j, Im_i = \
-            #     preprocess_input(Im_j[IN_RANGE].astype('float64')), \
-            #     preprocess_input(Im_i[IN_RANGE].astype('float64'))
-            #
-            # SCORES = np.where(scores_j < scores_i, scores_j, scores_i)
-            #
-            # ST = np.array(
-            #     [st.calculate(bb1, bb2) for bb1, bb2 in zip(aabb_i, aabb_j)]
-            # )
-            #
-            # DM = np.array(
-            #     [dm.calculate_cost(video_name, f1, bb1, f2, bb2) for \
-            #         f1, bb1, f2, bb2 in zip(frame_i, aabb_i, frame_j, aabb_j)]
-            # )
-            #
-            # Y = reid.predict_raw(np.concatenate([Im_i, Im_j], axis=3))[:,0]
-            #
-            # Bias = np.ones(ST.shape)
-            #
-            #
-            # assert np.min(delta) >= 0
-            #
-            # F = np.array([
-            #     Bias,
-            #     ST, DM, Y, SCORES,
-            #     ST**2, ST * DM, ST * Y, ST * SCORES,
-            #     DM**2, DM * Y, DM * SCORES,
-            #     Y**2, Y * SCORES,
-            #     SCORES**2
-            # ]).T
-            #
-            # edge_weights = np.einsum('ij,ij->i', F, W[delta])
+
             delta, edge_weights, i_, j_ = gen_feature_batch(
                 batch, lookup, dmax, dm, reid, W, video_name)
 
             for i, j, w, d in zip(i_, j_, edge_weights, delta):
-                w = -1 * w
+                #w = -1 * w
                 if d < lifted_edge_start:
                     txt = str(i) + " " + str(j) + " " + str(w) + "\n"
                     EDGE_FILE.write(txt)

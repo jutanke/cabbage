@@ -140,5 +140,6 @@ def gen_feature_batch(batch, lookup, dmax, dm, reid, W, video_name):
     ]).T
 
     edge_weights = np.einsum('ij,ij->i', F, W[delta])
+    edge_weights *= -1
 
     return delta, edge_weights, i, j
