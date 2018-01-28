@@ -124,22 +124,26 @@ def gen_feature_batch(batch, lookup, dmax, dm, reid, W, video_name):
             f1, bb1, f2, bb2 in zip(frame_i, aabb_i, frame_j, aabb_j)]
     )
 
-    Y = reid.predict_raw(np.concatenate([Im_i, Im_j], axis=3))[:,0]
+    if Im_i.shape[0] > 0:
+        # there is at least one entry
+        Y = reid.predict_raw(np.concatenate([Im_i, Im_j], axis=3))[:,0]
 
-    Bias = np.ones(ST.shape)
+        Bias = np.ones(ST.shape)
 
-    assert np.min(delta) >= 0
+        assert np.min(delta) >= 0
 
-    F = np.array([
-        Bias,
-        ST, DM, Y, SCORES,
-        ST**2, ST * DM, ST * Y, ST * SCORES,
-        DM**2, DM * Y, DM * SCORES,
-        Y**2, Y * SCORES,
-        SCORES**2
-    ]).T
+        F = np.array([
+            Bias,
+            ST, DM, Y, SCORES,
+            ST**2, ST * DM, ST * Y, ST * SCORES,
+            DM**2, DM * Y, DM * SCORES,
+            Y**2, Y * SCORES,
+            SCORES**2
+        ]).T
 
-    edge_weights = np.einsum('ij,ij->i', F, W[delta])
-    edge_weights *= -1
+        edge_weights = np.einsum('ij,ij->i', F, W[delta])
+        edge_weights *= -1
 
-    return delta, edge_weights, i, j
+        return delta, edge_weights, i, j
+    else:
+        return [], [], [], []

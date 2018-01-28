@@ -35,7 +35,6 @@ class pairwise_features:
             self.stacknet = reid_object
 
 
-
     def get_pairwise_vector(self,video_name,I1, I2, frame1,frame2,bb1,bb2,conf1,conf2,
         i1=None, i2=None):
         if i1 is None:
