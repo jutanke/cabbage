@@ -26,9 +26,10 @@ mot16 = MOT16_Experiments(root)
 video_name = 'MOT16-11'
 X = mot16.mot16_11_X
 
-Dt = mot16.mot16_11_detections
+#Dt = mot16.mot16_11_detections
+Dt = mot16.mot16_11_true_detections_no_pid
 vd = VideoData(Dt)
-#Dt = vd.get_n_first_frames(100)
+#Dt = vd.get_n_first_frames(50)
 
 W = get_W_mot16_02_dmax100(root)
 
@@ -37,4 +38,4 @@ print("\n")
 
 
 generator = BatchGraphGenerator(root, reid=reid, dm=dm, dmax=dmax, video_name=video_name)
-generator.build(Dt, X, W, batch_size=700)
+generator.build(Dt, X, W, batch_size=1700)
