@@ -10,11 +10,26 @@ from cselect import color as cs
 # Helper functions
 # ===========================================
 
-def remove_negative_pairs(Dt, W, H):
+def remove_negative_pairs(Dt, W, H, is_gt_trajectory=False):
+    """
+        ...
+        is_gt_trajectory: {boolean} if true than the
+            structure of the data is slightly different
+    """
     result = []
-    for frame, x, y, w, h, score in Dt:
-        if x >= 0 and y >= 0 and x + w < W and y + h < H:
-            result.append((frame, x, y, w, h, score))
+    if is_gt_trajectory:
+        for frame, pid, x, y, w, h in Dt:
+            if x >= 0 and y >= 0 and x + w < W and y + h < H:
+                result.append((frame, pid, x, y, w, h))
+    else:
+        if Dt.shape[1] == 7:
+            for frame, pid, x, y, w, h, score in Dt:
+                if x >= 0 and y >= 0 and x + w < W and y + h < H:
+                    result.append((frame, pid, x, y, w, h, score))
+        else:
+            for frame, x, y, w, h, score in Dt:
+                if x >= 0 and y >= 0 and x + w < W and y + h < H:
+                    result.append((frame, x, y, w, h, score))
     return np.array(result)
 
 def get_visible_pedestrains(Y_gt, frame):
