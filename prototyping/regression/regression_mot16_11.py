@@ -19,17 +19,17 @@ root = Settings['data_root']
 
 mot16 = MOT16_Experiments(root)
 
-video_name = 'MOT16-02'
-video = mot16.mot16_02_X
-dmax = 60
+video_name = 'MOT16-11'
+video = mot16.mot16_11_X
+dmax = 100
 
 # --------------
 dm = ReadOnlyDeepMatching(root, 100)
 reid = StoredReId(root, 100)
-reid.set_mot16_02_dmax100_true_predictions3105()
+reid.set_mot16_11_dmax100_true_predictions3349()
 # --------------
 
-Hy = mot16.mot16_02_true_detections
+Hy = mot16.mot16_11_true_detections
 
 regression = Regression(Hy, root,  video_name, video, dmax,
                         DM_object=dm, reid_object=reid,
