@@ -30,12 +30,16 @@ class VideoData:
         """
             n: {int} get frames from 1 ... n
         """
-        assert self.is_ordered, 'This code currently only works ordered'
+        #assert self.is_ordered, 'This code currently only works ordered'
         result = []
         for i in range(0, self.n_detections):
             frame = self.data[i][0]
             if frame > n:
-                break
+                if self.is_ordered:
+                    break
+                else:
+                    continue
             result.append(self.data[i])
-            
+
+
         return np.array(result)
