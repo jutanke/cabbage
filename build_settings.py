@@ -12,5 +12,5 @@ graph_solver = join(current_loc, 'build/sample')
 with open('settings.txt', 'w') as f:
     f.write("{\n")
     f.write('\t"data_root": "/tmp/mpt",\n')
-    f.write('\t"deepmatching":"' + deepmatch + '",\n')
+    f.write('\t"deepmatch":"' + deepmatch + '",\n')
     f.write('\t"graph_solver":"' + graph_solver + '"\n}')

@@ -10,5 +10,5 @@ endif()
 INCLUDE_DIRECTORIES("external/graph/include")
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable( Sample src/cabbage.cpp )
-target_link_libraries( Sample ${OpenCV_LIBS} )
+add_executable( sample src/cabbage.cpp )
+target_link_libraries( sample ${OpenCV_LIBS} )
